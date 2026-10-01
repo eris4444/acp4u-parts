@@ -1,0 +1,2436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F2741">
+<title>ACP4U Parts Requests</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230F2741'/%3E%3Ctext x='32' y='42' font-family='Arial' font-weight='900' font-size='26' text-anchor='middle' fill='%23F57C1F'%3E4U%3C/text%3E%3C/svg%3E">
+<style>
+:root {
+  --navy-950: #081627; --navy-900: #0B1F35; --navy-800: #0F2741; --navy-700: #1E3A5F; --navy-600: #2B4C78;
+  --navy-200: #C9D4E3; --navy-100: #E3EAF3; --navy-50: #F3F6FA;
+  --orange: #F57C1F; --orange-600: #E06A10; --orange-100: #FFF1E6; --orange-50: #FFF8F1;
+  --excel: #107C41; --excel-600: #0B6A37; --excel-100: #E6F4EC;
+  --text: #1F2937; --muted: #64748B; --line: #DCE3EC; --card: #FFFFFF; --bg: #EEF2F7;
+  --ok: #15803D; --danger: #DC2626; --danger-bg: #FDECEC; --warn: #B45309; --warn-bg: #FEF3E2;
+  --radius: 16px;
+  --shadow: 0 1px 2px rgba(15, 39, 65, .06), 0 10px 30px rgba(15, 39, 65, .07);
+  --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14.5px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+a { color: var(--navy-600); }
+kbd { font-family: inherit; font-size: 11.5px; background: var(--navy-50); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 0 6px; display: inline-block; line-height: 1.6; }
+.muted { color: var(--muted); }
+.mono { font-family: Consolas, "Cascadia Mono", "Courier New", monospace; letter-spacing: .4px; }
+
+/* ---------- top bar ---------- */
+.topbar { position: sticky; top: 0; z-index: 30; color: #fff; background: linear-gradient(120deg, var(--navy-900), var(--navy-700)); box-shadow: 0 2px 14px rgba(8, 22, 39, .28); }
+.topbar::after { content: ""; display: block; height: 3px; background: linear-gradient(90deg, var(--orange), #FFB066 50%, var(--orange)); }
+.topbar-in { max-width: 1320px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 14px; margin-inline-end: auto; min-width: 0; }
+.logo { font-weight: 900; font-size: 21px; letter-spacing: .5px; background: #fff; color: var(--navy-800); border-radius: 11px; padding: 2px 11px; line-height: 1.4; box-shadow: inset 0 -3px 0 var(--orange); flex-shrink: 0; }
+.logo span { color: var(--orange); }
+.brand h1 { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.35; }
+.brand p { margin: 0; font-size: 12.5px; color: #B9CAE0; display: flex; align-items: center; gap: 7px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #22C55E; box-shadow: 0 0 0 3px rgba(34, 197, 94, .25); }
+.top-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.tbtn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(255, 255, 255, .16); background: rgba(255, 255, 255, .06); color: #fff; padding: 6px 12px; border-radius: 10px; font-size: 13px; transition: background .15s, border-color .15s; }
+.tbtn:hover { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .3); }
+
+/* ---------- layout ---------- */
+.wrap { max-width: 1320px; margin: 0 auto; padding: 20px; }
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid #E6ECF3; margin-bottom: 20px; }
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 18px 22px 0; }
+.card-head h2 { margin: 0; font-size: 17px; font-weight: 700; color: var(--navy-800); display: flex; align-items: center; gap: 10px; }
+.card-head h2::before { content: ""; width: 6px; height: 20px; border-radius: 4px; background: var(--orange); }
+.card-head .sub { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+.pill { white-space: nowrap; background: var(--navy-100); color: var(--navy-700); font-weight: 700; font-size: 13px; border-radius: 999px; padding: 4px 14px; }
+.card.editing { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(245, 124, 31, .15), var(--shadow); }
+.card.editing .pill { background: var(--orange-100); color: var(--orange-600); }
+
+/* ---------- stats ---------- */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+.stat { background: var(--card); border-radius: 14px; border: 1px solid #E6ECF3; box-shadow: var(--shadow); padding: 14px 16px; display: flex; align-items: center; gap: 14px; }
+.stat-ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; background: var(--navy-100); color: var(--navy-700); }
+.stat:nth-child(2) .stat-ic { background: #EEE9FB; color: #6D28D9; }
+.stat:nth-child(3) .stat-ic { background: var(--orange-100); color: var(--orange-600); }
+.stat:nth-child(4) .stat-ic { background: var(--excel-100); color: var(--excel); }
+.stat b { display: block; font-size: 22px; font-weight: 800; color: var(--navy-800); line-height: 1.25; }
+.stat span { font-size: 12.5px; color: var(--muted); }
+.banner { display: flex; align-items: center; gap: 10px; border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; font-size: 13.5px; flex-wrap: wrap; }
+.banner.info { background: #fff; color: var(--navy-700); border: 1px solid var(--line); }
+.banner.info svg { color: var(--excel); flex-shrink: 0; }
+.banner.err { background: var(--danger-bg); color: var(--danger); border: 1px solid #F6C4C4; }
+.banner .grow { flex: 1 1 260px; }
+.banner button { border: 1px solid var(--line); background: var(--navy-50); color: var(--navy-700); font-weight: 600; border-radius: 9px; padding: 4px 12px; font-size: 13px; }
+.banner button:hover { border-color: var(--navy-200); background: var(--navy-100); }
+
+/* ---------- form ---------- */
+form#entryForm { padding: 16px 22px 22px; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 16px; }
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.field.wide { grid-column: 1 / -1; }
+.field.span2 { grid-column: span 2; }
+.field > span { font-size: 13px; font-weight: 600; color: var(--navy-700); display: flex; align-items: center; gap: 4px; }
+.field > span i { color: var(--orange); font-style: normal; }
+.field > span em { color: var(--muted); font-weight: 400; font-style: normal; font-size: 12px; }
+.field .counter { margin-inline-start: auto; font-weight: 600; font-size: 11.5px; color: var(--muted); }
+.field .counter.ok { color: var(--ok); }
+.field input, .field textarea { width: 100%; border: 1.5px solid var(--line); background: #FBFCFE; border-radius: 11px; padding: 9px 12px; outline: none; transition: border-color .15s, box-shadow .15s, background .15s; }
+.field textarea { resize: vertical; min-height: 64px; }
+.field input:hover, .field textarea:hover { border-color: var(--navy-200); }
+.field input:focus, .field textarea:focus { border-color: var(--orange); background: #fff; box-shadow: 0 0 0 4px rgba(245, 124, 31, .15); }
+#f-vin { text-transform: uppercase; }
+#f-vin::placeholder { text-transform: none; font-family: var(--font); letter-spacing: 0; }
+.field.invalid input, .field.invalid textarea { border-color: var(--danger); background: #FFF7F7; }
+.field.invalid > span { color: var(--danger); }
+.hint { font-size: 12px; color: var(--warn); line-height: 1.5; }
+.hint:empty { display: none; }
+.hint.info { color: var(--navy-600); }
+.hint button { border: 0; background: none; padding: 0; color: var(--orange-600); font-weight: 700; text-decoration: underline; font-size: 12px; }
+
+.photos-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 18px 0 8px; }
+.photos-head span { font-size: 13px; font-weight: 600; color: var(--navy-700); }
+.photos-head em { font-style: normal; font-weight: 400; color: var(--muted); font-size: 12px; }
+.photos-head small { color: var(--muted); font-size: 12px; }
+.photos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; max-width: 860px; }
+.slot { position: relative; aspect-ratio: 1 / 1; min-width: 0; min-height: 0; width: 100%; border-radius: 14px; border: 2px dashed var(--navy-200); background: var(--navy-50); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--navy-600); cursor: pointer; overflow: hidden; transition: border-color .15s, background .15s; outline: none; }
+.slot:hover, .slot:focus-visible { border-color: var(--orange); background: var(--orange-50); color: var(--orange-600); }
+.slot .slot-lbl { font-size: 12.5px; font-weight: 600; }
+.slot .slot-plus { width: 42px; height: 42px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 2px 8px rgba(15, 39, 65, .08); }
+.slot.filled { border: 2px solid var(--line); background: #fff; }
+.slot.filled img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.slot.filled::after { content: "Click to replace"; position: absolute; inset: auto 0 0 0; background: linear-gradient(transparent, rgba(8, 22, 39, .75)); color: #fff; font-size: 12px; text-align: center; padding: 18px 0 6px; opacity: 0; transition: opacity .15s; }
+.slot.filled:hover::after { opacity: 1; }
+.slot-n { position: absolute; top: 7px; left: 7px; background: var(--navy-800); color: #fff; font-size: 12px; font-weight: 700; width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; }
+.slot-x { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 9px; border: 0; background: rgba(220, 38, 38, .92); color: #fff; font-size: 18px; line-height: 1; display: grid; place-items: center; z-index: 2; box-shadow: 0 2px 6px rgba(0, 0, 0, .2); }
+.slot-x:hover { background: #B91C1C; }
+.slot.loading { cursor: progress; border-style: solid; }
+#formCard.drop { border-color: var(--orange); box-shadow: 0 0 0 4px rgba(245, 124, 31, .25), var(--shadow); }
+#formCard.drop .slot.vacant { border-color: var(--orange); background: var(--orange-50); }
+
+.form-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; align-items: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid transparent; border-radius: 12px; padding: 9px 18px; font-weight: 600; font-size: 14px; transition: background .15s, border-color .15s, transform .05s; white-space: nowrap; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn.primary { background: var(--orange); color: #fff; box-shadow: 0 6px 16px rgba(245, 124, 31, .3); }
+.btn.primary:hover:not(:disabled) { background: var(--orange-600); }
+.btn.light { background: #fff; border-color: var(--line); color: var(--navy-700); }
+.btn.light:hover { border-color: var(--navy-200); background: var(--navy-50); }
+.btn.danger { background: var(--danger); color: #fff; }
+.btn.danger:hover { background: #B91C1C; }
+.btn.excel { background: var(--excel); color: #fff; box-shadow: 0 6px 16px rgba(16, 124, 65, .25); }
+.btn.excel:hover:not(:disabled) { background: var(--excel-600); }
+.btn.block { width: 100%; }
+.btn .cnt { background: rgba(255, 255, 255, .22); border-radius: 999px; padding: 0 9px; font-size: 12.5px; }
+.form-actions .kbd-hint { color: var(--muted); font-size: 12.5px; margin-inline-start: auto; }
+
+/* ---------- list ---------- */
+.list-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 16px 22px; border-bottom: 1px solid var(--line); }
+.search { position: relative; flex: 1 1 240px; max-width: 380px; }
+.search svg { position: absolute; top: 50%; left: 12px; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.search input { width: 100%; border: 1.5px solid var(--line); background: var(--navy-50); border-radius: 11px; padding: 8px 12px 8px 38px; outline: none; }
+.search input:focus { border-color: var(--orange); background: #fff; box-shadow: 0 0 0 4px rgba(245, 124, 31, .15); }
+.seg { display: inline-flex; background: var(--navy-50); border: 1px solid var(--line); border-radius: 11px; padding: 3px; }
+.seg button { border: 0; background: transparent; padding: 5px 11px; border-radius: 8px; font-size: 13px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.seg button.on { background: var(--navy-800); color: #fff; box-shadow: 0 2px 6px rgba(15, 39, 65, .2); }
+.spacer { flex: 1; }
+.chk { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--navy-700); cursor: pointer; user-select: none; }
+.chk input { accent-color: var(--excel); width: 16px; height: 16px; margin: 0; }
+
+.table-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13.5px; }
+.tbl th { background: var(--navy-700); color: #fff; font-weight: 600; font-size: 12.5px; padding: 10px 8px; text-align: center; white-space: nowrap; border-bottom: 3px solid var(--orange); }
+.tbl th.ph { background: var(--orange); border-bottom-color: var(--orange-600); }
+.tbl td { padding: 10px 8px; text-align: center; vertical-align: middle; border-bottom: 1px solid #E8EDF4; }
+.tbl tbody tr:nth-child(even) td { background: #F7FAFD; }
+.tbl tbody tr:hover td { background: #FFF8F1; }
+.tbl tbody tr.flash td { animation: flash 2.2s ease-out; }
+@keyframes flash { 0%, 30% { background: #FFE6CF; } }
+.rn { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 9px; background: var(--navy-100); color: var(--navy-800); font-weight: 700; }
+.tbl td.strong { font-weight: 600; color: var(--navy-800); }
+.tbl td .sub { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+.tbl td.part { color: #9A3412; font-weight: 600; max-width: 260px; }
+.tbl td.date { white-space: nowrap; font-size: 12.5px; }
+.tbl td a { text-decoration: none; }
+.tbl td a:hover { text-decoration: underline; }
+.chip { display: inline-block; margin-top: 3px; border-radius: 999px; padding: 0 9px; font-size: 11.5px; font-weight: 700; line-height: 1.8; }
+.chip.new { background: var(--orange-100); color: var(--orange-600); }
+.chip.done { background: var(--excel-100); color: var(--excel); }
+.thumbs { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+.th { width: 44px; height: 44px; padding: 0; border-radius: 9px; overflow: hidden; border: 1.5px solid var(--line); background: var(--navy-50); transition: transform .12s, border-color .12s; }
+.th:hover { transform: scale(1.07); border-color: var(--orange); }
+.th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.acts { white-space: nowrap; }
+.ib { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--navy-600); display: inline-grid; place-items: center; margin: 0 2px; transition: background .12s, color .12s, border-color .12s; }
+.ib:hover { background: var(--navy-800); border-color: var(--navy-800); color: #fff; }
+.ib.danger { color: var(--danger); }
+.ib.danger:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+.list-empty { text-align: center; padding: 46px 20px; color: var(--muted); }
+.list-empty .em-ic { width: 70px; height: 70px; margin: 0 auto 10px; border-radius: 20px; display: grid; place-items: center; background: var(--navy-50); color: var(--navy-600); }
+.list-empty b { display: block; color: var(--navy-800); font-size: 15px; }
+.more { text-align: center; padding: 14px; }
+.foot { text-align: center; color: var(--muted); font-size: 12px; padding: 6px 0 24px; }
+
+/* ---------- overlays ---------- */
+.overlay { position: fixed; inset: 0; z-index: 60; background: rgba(8, 22, 39, .55); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 16px; animation: fade .15s; }
+@keyframes fade { from { opacity: 0; } }
+.dialog { width: min(440px, 100%); background: #fff; border-radius: 18px; padding: 22px; box-shadow: 0 24px 60px rgba(8, 22, 39, .35); animation: pop .18s ease-out; }
+@keyframes pop { from { transform: translateY(8px) scale(.98); opacity: 0; } }
+.dialog h3 { margin: 0 0 8px; font-size: 17px; color: var(--navy-800); }
+.dlg-body { color: #334155; font-size: 14px; }
+.dlg-actions { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
+.err { color: var(--danger); font-size: 13px; margin: 8px 0 0; }
+.err:empty { display: none; }
+
+.busy-card { background: #fff; border-radius: 18px; padding: 26px 28px; width: min(380px, 100%); text-align: center; box-shadow: 0 24px 60px rgba(8, 22, 39, .35); }
+.busy-card p { margin: 12px 0 10px; font-weight: 600; color: var(--navy-800); }
+.bar { height: 8px; border-radius: 99px; background: var(--navy-100); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--orange), #FFB066); border-radius: 99px; transition: width .2s; }
+.spinner { width: 42px; height: 42px; border-radius: 50%; border: 4px solid var(--navy-100); border-top-color: var(--orange); animation: spin .8s linear infinite; margin: 0 auto; display: block; }
+.spinner.sm { width: 26px; height: 26px; border-width: 3px; margin: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.lightbox { position: fixed; inset: 0; z-index: 70; background: rgba(5, 14, 26, .92); display: flex; align-items: center; justify-content: center; padding: 56px 64px; }
+.lightbox figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 100%; max-height: 100%; }
+.lightbox img { max-width: 100%; max-height: calc(100vh - 170px); border-radius: 12px; box-shadow: 0 20px 60px rgba(0, 0, 0, .5); background: #fff; }
+.lightbox figcaption { color: #E2E8F0; font-size: 13.5px; text-align: center; }
+.lb-btn { position: absolute; border: 0; background: rgba(255, 255, 255, .12); color: #fff; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font-size: 26px; line-height: 1; }
+.lb-btn:hover { background: rgba(255, 255, 255, .25); }
+.lb-x { top: 14px; right: 14px; }
+.lb-prev { left: 14px; top: 50%; transform: translateY(-50%); }
+.lb-next { right: 14px; top: 50%; transform: translateY(-50%); }
+.lb-dl { position: absolute; top: 14px; left: 14px; color: #fff; text-decoration: none; background: rgba(255, 255, 255, .12); border-radius: 12px; padding: 8px 14px; font-size: 13px; display: inline-flex; gap: 6px; align-items: center; }
+.lb-dl:hover { background: rgba(255, 255, 255, .25); }
+
+.auth { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 16px; background: radial-gradient(circle at 20% 10%, #24476F 0, transparent 45%), linear-gradient(140deg, var(--navy-950), var(--navy-700)); }
+.auth-card { width: min(380px, 100%); background: #fff; border-radius: 22px; padding: 30px 26px 24px; box-shadow: 0 30px 80px rgba(0, 0, 0, .4); text-align: center; border-top: 5px solid var(--orange); }
+.auth-card .logo { display: inline-block; font-size: 28px; padding: 3px 16px; background: var(--navy-800); color: #fff; }
+.auth-card h2 { margin: 16px 0 4px; font-size: 18px; color: var(--navy-800); }
+.auth-card p { margin: 0 0 16px; font-size: 13px; }
+.auth-card input[type=text], .auth-card input[type=password] { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; outline: none; background: var(--navy-50); }
+.auth-card input:focus { border-color: var(--orange); background: #fff; box-shadow: 0 0 0 4px rgba(245, 124, 31, .15); }
+.auth-card .chk { margin: 2px 0 14px; }
+.auth-card.shake { animation: shake .35s; }
+@keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+
+.toasts { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 90; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; width: min(92vw, 520px); }
+.toast { pointer-events: auto; background: var(--navy-800); color: #fff; padding: 10px 18px; border-radius: 12px; box-shadow: 0 10px 30px rgba(8, 22, 39, .3); font-size: 14px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: opacity .2s, transform .2s; border-inline-start: 5px solid #94A3B8; }
+.toast.in { opacity: 1; transform: none; }
+.toast.ok { border-inline-start-color: #22C55E; }
+.toast.error { border-inline-start-color: #F87171; background: #3B1219; }
+.toast.warn { border-inline-start-color: var(--orange); }
+
+/* ---------- platform chips ---------- */
+.plats { display: flex; flex-wrap: wrap; gap: 8px; }
+.plat { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: #fff; color: var(--navy-700); border-radius: 999px; padding: 5px 13px 5px 9px; font-size: 13px; font-weight: 600; transition: border-color .12s, background .12s, color .12s; }
+.plat i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex-shrink: 0; }
+.plat:hover { border-color: var(--c); }
+.plat.on { background: var(--c); border-color: var(--c); color: var(--fg, #fff); box-shadow: 0 3px 10px rgba(15, 39, 65, .15); }
+.plat.on i { background: var(--fg, #fff); }
+.field input.plat-other { margin-top: 8px; max-width: 260px; }
+.ptag { display: inline-flex; align-items: center; gap: 5px; margin-top: 3px; border-radius: 999px; padding: 0 9px; font-size: 11.5px; font-weight: 700; line-height: 1.8; background: var(--c); color: var(--fg, #fff); }
+
+/* ---------- exports folder + file search ---------- */
+.banner.warn { background: var(--warn-bg); color: var(--warn); border: 1px solid #F8D9AE; }
+.banner.warn svg, .banner.info svg.fold { color: var(--orange-600); flex-shrink: 0; }
+.banner.primary-btn button { background: var(--orange); border-color: var(--orange); color: #fff; }
+.banner.primary-btn button:hover { background: var(--orange-600); border-color: var(--orange-600); }
+.tbtn.hl { background: var(--orange); border-color: var(--orange); }
+.tbtn.hl:hover { background: var(--orange-600); border-color: var(--orange-600); }
+.btn.sm { padding: 5px 12px; font-size: 13px; border-radius: 10px; }
+mark { background: #FFE08A; color: inherit; border-radius: 3px; padding: 0 1px; }
+
+.panel { position: fixed; inset: 0; z-index: 50; background: var(--bg); overflow-y: auto; animation: fade .15s; }
+.panel-top { position: sticky; top: 0; z-index: 2; background: linear-gradient(120deg, var(--navy-900), var(--navy-700)); color: #fff; box-shadow: 0 2px 14px rgba(8, 22, 39, .28); }
+.panel-top::after { content: ""; display: block; height: 3px; background: linear-gradient(90deg, var(--orange), #FFB066 50%, var(--orange)); }
+.panel-top-in { max-width: 1100px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.panel-top h2 { margin: 0; font-size: 17px; }
+.panel-top p { margin: 0; font-size: 12.5px; color: #B9CAE0; }
+.panel-top .grow { flex: 1 1 260px; }
+.panel-search { display: flex; gap: 8px; width: 100%; }
+.panel-search .search { max-width: none; flex: 1; }
+.panel-search .search input { background: #fff; color: var(--text); font-size: 15px; padding-top: 10px; padding-bottom: 10px; }
+.panel-body { max-width: 1100px; margin: 0 auto; padding: 16px 20px 40px; }
+.sp-status { color: var(--muted); font-size: 13px; margin: 0 0 12px; min-height: 20px; }
+.sp-gate { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 28px; text-align: center; box-shadow: var(--shadow); }
+.sp-gate b { display: block; font-size: 16px; color: var(--navy-800); margin-bottom: 6px; }
+.sp-gate p { color: var(--muted); margin: 0 0 16px; }
+.sp-empty { text-align: center; color: var(--muted); padding: 40px 10px; }
+.sp-empty b { display: block; color: var(--navy-800); font-size: 15px; }
+.sp-file { background: #fff; border: 1px solid #E6ECF3; border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; }
+.sp-file-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--navy-50); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.sp-file-head svg { color: var(--excel); flex-shrink: 0; }
+.sp-file-head b { color: var(--navy-800); word-break: break-all; }
+.sp-file-head .muted { font-size: 12.5px; }
+.sp-file-head .pill { margin-inline-start: auto; }
+.sp-row { padding: 14px 16px; border-bottom: 1px solid #EEF2F7; }
+.sp-row:last-child { border-bottom: 0; }
+.sp-row.saved { animation: flash 2.2s ease-out; }
+.sp-row-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.sp-row-head .rn { min-width: 0; padding: 0 10px; font-size: 12.5px; }
+.sp-row-head .btn { margin-inline-start: auto; }
+.sp-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px 16px; }
+.sp-f { min-width: 0; }
+.sp-f span { display: block; font-size: 11.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+.sp-f div { font-size: 14px; color: var(--text); word-break: break-word; white-space: pre-line; }
+.sp-f.part div { color: #9A3412; font-weight: 600; }
+.sp-thumbs { justify-content: flex-start; margin-top: 10px; }
+.sp-thumbs:empty { display: none; }
+.sp-edit .grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+.sp-edit .form-actions { margin-top: 12px; }
+.sp-note { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1020px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 860px) {
+  .wrap { padding: 14px 12px; }
+  .topbar-in { padding: 8px 12px; }
+  .brand h1 { font-size: 15px; }
+  .top-actions { width: 100%; }
+  .tbtn { flex: 1 1 auto; justify-content: center; font-size: 12.5px; padding: 6px 8px; }
+  .card-head, form#entryForm, .list-toolbar { padding-left: 14px; padding-right: 14px; }
+  .photos { gap: 7px; }
+  .slot .slot-plus { width: 30px; height: 30px; }
+  .slot .slot-plus svg { width: 16px; height: 16px; }
+  .slot .slot-lbl { font-size: 11px; }
+  .slot-x { width: 24px; height: 24px; font-size: 15px; }
+  .slot-n { width: 20px; height: 20px; font-size: 11px; }
+  .form-actions .kbd-hint { display: none; }
+  .form-actions .btn { flex: 1 1 auto; }
+  .search { max-width: none; flex-basis: 100%; }
+  .list-toolbar .btn.excel { flex: 1 1 100%; }
+  .tbl thead { display: none; }
+  .tbl, .tbl tbody, .tbl tr, .tbl td { display: block; width: 100%; }
+  .tbl tbody { padding: 12px; }
+  .tbl tr { border: 1px solid var(--line); border-radius: 14px; margin-bottom: 12px; padding: 6px 12px; background: #fff; box-shadow: 0 2px 8px rgba(15, 39, 65, .05); }
+  .tbl tbody tr:nth-child(even) td, .tbl tbody tr:hover td { background: transparent; }
+  .tbl td { border: 0; border-bottom: 1px dashed #E8EDF4; padding: 7px 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: right; max-width: none !important; }
+  .tbl td:last-child { border-bottom: 0; }
+  .tbl td::before { content: attr(data-l); color: var(--muted); font-family: var(--font); letter-spacing: 0; font-size: 12.5px; font-weight: 600; flex-shrink: 0; text-align: left; }
+  .tbl td.acts { justify-content: flex-end; }
+  .tbl td.acts::before { content: none; }
+  .thumbs { justify-content: flex-end; }
+  .lightbox { padding: 60px 10px 70px; }
+  .panel-top-in { padding: 10px 12px; }
+  .panel-body { padding: 12px 12px 30px; }
+  .sp-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lb-prev, .lb-next { top: auto; bottom: 12px; transform: none; }
+}
+@media (max-width: 520px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .field.span2 { grid-column: auto; }
+  .stats { gap: 10px; }
+  .stat { padding: 10px 12px; gap: 10px; }
+  .stat-ic { width: 36px; height: 36px; }
+  .stat b { font-size: 18px; }
+  .brand p { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <div class="logo">ACP<span>4U</span></div>
+      <div>
+        <h1>Customer Parts Requests</h1>
+        <p><i class="dot"></i><span id="modeLabel">Saved automatically on this computer</span></p>
+      </div>
+    </div>
+    <nav class="top-actions">
+      <button class="tbtn hl" id="btnSearchFiles" type="button" title="Search inside every Excel file in the exports folder">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        Search Excel files</button>
+      <button class="tbtn" id="btnTemplate" type="button" title="Download an empty Excel form to fill in by hand">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+        Blank Excel form</button>
+      <button class="tbtn" id="btnBackup" type="button" title="Save every row and photo into one ZIP file">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        Backup</button>
+      <button class="tbtn" id="btnRestore" type="button" title="Add rows from a backup ZIP">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
+        Restore</button>
+      <button class="tbtn" id="btnLogout" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+        Sign out</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="banner info" id="infoBanner">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    <span class="grow" id="infoText">Every saved row stays here — close the page anytime, come back tomorrow, keep adding, and export when you are ready.</span>
+    <span class="muted" id="backupInfo"></span>
+    <button type="button" id="btnBackup2">Back up now</button>
+  </div>
+  <div class="banner warn" id="folderBanner" hidden>
+    <svg class="fold" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+    <span class="grow" id="folderText"></span>
+    <button type="button" id="btnFolder">Choose exports folder</button>
+  </div>
+
+  <section class="stats">
+    <div class="stat"><div class="stat-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><div><b id="stTotal">0</b><span>Total requests</span></div></div>
+    <div class="stat"><div class="stat-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div><b id="stToday">0</b><span>Added today</span></div></div>
+    <div class="stat"><div class="stat-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><b id="stPending">0</b><span>Not exported yet</span></div></div>
+    <div class="stat"><div class="stat-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></div><div><b id="stPhotos">0</b><span>Photos saved</span></div></div>
+  </section>
+
+  <section class="card" id="formCard">
+    <div class="card-head">
+      <div>
+        <h2 id="formTitle">New request</h2>
+        <p class="sub">Fields marked * are required. Each saved request becomes one row in the Excel file.</p>
+      </div>
+      <span class="pill" id="nextRow">Row 1</span>
+    </div>
+    <form id="entryForm" novalidate autocomplete="off">
+      <div class="grid">
+        <div class="field wide"><span>Where did the customer contact you? <em>(the app remembers your last choice)</em></span>
+          <div class="plats" id="plats" role="radiogroup" aria-label="Platform"></div>
+          <input type="hidden" id="f-platform">
+          <input id="platOther" class="plat-other" placeholder="Platform name" maxlength="40" hidden></div>
+        <label class="field"><span>Customer ID <i>*</i></span>
+          <input id="f-customerId" placeholder="@username" maxlength="120" enterkeyhint="next">
+          <small class="hint info" id="custHint"></small></label>
+        <label class="field"><span>Phone number <em>(if available)</em></span>
+          <input id="f-phone" inputmode="tel" placeholder="09xxxxxxxxx" maxlength="40" enterkeyhint="next"></label>
+        <label class="field"><span>Country / City <em>(if available)</em></span>
+          <input id="f-location" list="dlLocations" placeholder="e.g. Iran / Tehran" maxlength="80" enterkeyhint="next"></label>
+        <label class="field"><span>Car brand <i>*</i></span>
+          <input id="f-brand" list="dlBrands" placeholder="e.g. Peugeot, Kia, Toyota" maxlength="80" enterkeyhint="next"></label>
+        <label class="field"><span>Car model <i>*</i></span>
+          <input id="f-model" list="dlModels" placeholder="e.g. 206, Cerato, Camry" maxlength="80" enterkeyhint="next"></label>
+        <label class="field"><span>Model year <i>*</i></span>
+          <input id="f-year" inputmode="numeric" placeholder="e.g. 2019 or 1398" maxlength="20" enterkeyhint="next"></label>
+        <label class="field"><span>VIN code <em>(if available)</em><b class="counter" id="vinCount">0/17</b></span>
+          <input id="f-vin" class="mono" placeholder="17 characters (chassis number)" maxlength="40" spellcheck="false" enterkeyhint="next">
+          <small class="hint" id="vinHint"></small></label>
+        <label class="field span2"><span>Required part <i>*</i></span>
+          <textarea id="f-part" rows="2" maxlength="2000" placeholder="e.g. Right headlight — front brake pads — left side mirror with indicator"></textarea></label>
+      </div>
+
+      <div class="photos-head">
+        <span>Part photos <em>(up to 5)</em></span>
+        <small>Click a box, drag &amp; drop images here, or paste with <kbd>Ctrl</kbd>+<kbd>V</kbd>.</small>
+      </div>
+      <div class="photos" id="photos"></div>
+
+      <div class="form-actions">
+        <button class="btn primary" id="btnSave" type="submit">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span id="btnSaveTxt">Save &amp; add row</span></button>
+        <button class="btn light" id="btnClear" type="button">Clear form</button>
+        <button class="btn light" id="btnCancelEdit" type="button" hidden>Cancel editing</button>
+        <span class="kbd-hint">Quick save: <kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
+      </div>
+    </form>
+  </section>
+
+  <section class="card" id="listCard">
+    <div class="card-head" style="padding-bottom:4px">
+      <div><h2>Saved rows</h2><p class="sub">Export builds the Excel file from exactly the rows shown here, in the order they were added.</p></div>
+    </div>
+    <div class="list-toolbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Search ID, phone, car, VIN, part…">
+      </div>
+      <div class="seg" id="status" title="Export status">
+        <button type="button" data-s="all" class="on">All</button>
+        <button type="button" data-s="new">Not exported</button>
+        <button type="button" data-s="done">Exported</button>
+      </div>
+      <div class="seg" id="period" title="Date added">
+        <button type="button" data-p="all" class="on">Any time</button>
+        <button type="button" data-p="today">Today</button>
+        <button type="button" data-p="7">7 days</button>
+        <button type="button" data-p="30">30 days</button>
+      </div>
+      <div class="spacer"></div>
+      <label class="chk" title="Embed photos at full resolution (bigger file)"><input type="checkbox" id="hq"> High-quality photos</label>
+      <button class="btn excel" id="btnExport" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="m8 12 5 6M13 12l-5 6"/></svg>
+        Export to Excel <span class="cnt" id="exportCount">0</span></button>
+    </div>
+    <div class="table-wrap">
+      <table class="tbl" id="tbl">
+        <thead><tr>
+          <th>No.</th><th>Customer ID</th><th>Phone</th><th>Country / City</th><th>Car</th><th>Year</th><th>VIN code</th><th>Required part</th><th class="ph">Photos</th><th>Added</th><th></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="list-empty" id="empty" hidden>
+      <div class="em-ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M9 14h6"/></svg></div>
+      <b id="emptyTitle">No rows yet</b>
+      <span id="emptyText">Add the first request with the form above.</span>
+    </div>
+    <div class="more" id="moreWrap" hidden><button class="btn light" type="button" id="btnMore">Show more rows</button></div>
+  </section>
+
+  <footer class="foot">ACP4U Parts — request log &amp; Excel export with photos. Data never leaves this computer.</footer>
+</main>
+
+<datalist id="dlBrands"></datalist>
+<datalist id="dlModels"></datalist>
+<datalist id="dlLocations"></datalist>
+<input type="file" id="filePick" accept="image/*" multiple hidden>
+<input type="file" id="restorePick" accept=".zip,application/zip" hidden>
+
+<div class="panel" id="searchPanel" hidden>
+  <div class="panel-top">
+    <div class="panel-top-in">
+      <div class="logo">ACP<span>4U</span></div>
+      <div class="grow"><h2>Search Excel files</h2><p id="spFolder">Every Excel file in the exports folder</p></div>
+      <button class="tbtn" type="button" id="spRescan" title="Read the folder again">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg> Rescan</button>
+      <button class="tbtn" type="button" id="spClose">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg> Close</button>
+      <div class="panel-search">
+        <div class="search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="spQ" type="search" placeholder="Customer ID, phone, car, VIN, part… (several words = all must match)" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel-body">
+    <p class="sp-status" id="spStatus"></p>
+    <div class="sp-gate" id="spGate" hidden>
+      <b id="spGateTitle">Choose the exports folder first</b>
+      <p id="spGateText">The search reads every Excel file inside it.</p>
+      <button class="btn primary" type="button" id="spGateBtn">Choose exports folder</button>
+    </div>
+    <div id="spResults"></div>
+  </div>
+</div>
+
+<div class="overlay" id="dlg" hidden></div>
+
+<div class="overlay" id="busy" hidden>
+  <div class="busy-card"><span class="spinner"></span><p id="busyText">Please wait…</p><div class="bar"><i id="busyBar"></i></div></div>
+</div>
+
+<div class="lightbox" id="lb" hidden>
+  <a class="lb-dl" id="lbDl" href="#" download>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg> Download photo</a>
+  <button class="lb-btn lb-x" type="button" id="lbClose" aria-label="Close">×</button>
+  <button class="lb-btn lb-prev" type="button" id="lbPrev" aria-label="Previous photo">‹</button>
+  <figure><img id="lbImg" alt=""><figcaption id="lbCap"></figcaption></figure>
+  <button class="lb-btn lb-next" type="button" id="lbNext" aria-label="Next photo">›</button>
+</div>
+
+<div class="auth" id="auth" hidden>
+  <form class="auth-card" id="authForm" autocomplete="on">
+    <div class="logo">ACP<span>4U</span></div>
+    <h2>Sign in</h2>
+    <p class="muted">Customer parts requests</p>
+    <input type="text" id="authUser" placeholder="Username" autocomplete="username" autocapitalize="off" spellcheck="false">
+    <input type="password" id="authPw" placeholder="Password" autocomplete="current-password">
+    <label class="chk"><input type="checkbox" id="authRemember"> Keep me signed in on this computer</label>
+    <button class="btn primary block" type="submit">Sign in</button>
+    <p class="err" id="authErr"></p>
+  </form>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="xlsx.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* =================================================================== basics */
+const $ = (s, el = document) => el.querySelector(s);
+const SLOTS = 5;
+const FIELDS = ['customerId', 'platform', 'phone', 'location', 'brand', 'model', 'year', 'vin', 'part'];
+const REQUIRED = ['customerId', 'brand', 'model', 'year', 'part'];
+const LABELS = { customerId: 'Customer ID', platform: 'Platform', phone: 'Phone number', location: 'Country / City', brand: 'Car brand', model: 'Car model', year: 'Model year', vin: 'VIN code', part: 'Required part' };
+const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+// SHA-256 of "acp4u|<username>|<password>" — the sign-in check never stores the password itself
+const AUTH_HASH = '7a8ccf07457917235af4316dd08f066ae4553b93a0f647f95bfe9530c38b5034';
+const AUTH_KEY = 'acp4u_auth';
+const FA = '۰۱۲۳۴۵۶۷۸۹', AR = '٠١٢٣٤٥٦٧٨٩';
+const enDigits = (s) => String(s ?? '').replace(/[۰-۹٠-٩]/g, (d) => String(FA.includes(d) ? FA.indexOf(d) : AR.indexOf(d)));
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = (s) => enDigits(s).toLowerCase().replace(/ي/g, 'ی').replace(/ك/g, 'ک').replace(/[‌\s]+/g, ' ').trim();
+const custKey = (s) => norm(s).replace(/^@+/, '');
+const newId = () => Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, '0')).join('');
+const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+const fmtDate = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+const fmtTime = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+const fmtShort = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' });
+const startOfToday = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); };
+const pad2 = (n) => String(n).padStart(2, '0');
+const stamp = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const stampDT = (d) => `${stamp(d)}_${pad2(d.getHours())}-${pad2(d.getMinutes())}`;
+const safeName = (s) => String(s || '').replace(/[^\w؀-ۿ.-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40) || 'customer';
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// one clean-up rule per field, shared by the entry form and the Excel file editor
+const NORMALIZE = {
+  customerId: (v) => String(v).trim().replace(/\s+/g, ' '),
+  platform: (v) => String(v).trim().replace(/\s+/g, ' '),
+  location: (v) => String(v).trim().replace(/\s*[/\\]\s*/g, ' / ').replace(/\s+/g, ' '), // 'iran/tehran' -> 'iran / tehran'
+  phone: (v) => enDigits(String(v).trim()).replace(/[\s\-()]/g, ''),
+  brand: (v) => String(v).trim().replace(/\s+/g, ' '),
+  model: (v) => enDigits(String(v).trim()).replace(/\s+/g, ' '),
+  year: (v) => enDigits(String(v).trim()).replace(/\s+/g, ''),
+  vin: (v) => enDigits(String(v).trim()).toUpperCase().replace(/[\s-]/g, ''),
+  part: (v) => String(v).trim(),
+};
+// Excel header text -> app field (headers written by xlsx.js)
+const LABEL_KEY = { 'customer id': 'customerId', platform: 'platform', phone: 'phone', 'country / city': 'location', 'car brand': 'brand', 'car model': 'model', year: 'year', 'vin code': 'vin', 'required part': 'part' };
+
+function sha256Hex(text) {
+  const rotr = (v, n) => (v >>> n) | (v << (32 - n));
+  const K = [], H = [];
+  for (let n = 2; K.length < 64; n++) {
+    let prime = true;
+    for (let d = 2; d * d <= n; d++) if (n % d === 0) { prime = false; break; }
+    if (!prime) continue;
+    if (H.length < 8) H.push((Math.pow(n, 1 / 2) * 4294967296) | 0);
+    K.push((Math.pow(n, 1 / 3) * 4294967296) | 0);
+  }
+  const bytes = new TextEncoder().encode(text);
+  const buf = new Uint8Array(((bytes.length + 9 + 63) >> 6) << 6);
+  buf.set(bytes);
+  buf[bytes.length] = 0x80;
+  const dv = new DataView(buf.buffer);
+  const bits = bytes.length * 8;
+  dv.setUint32(buf.length - 8, Math.floor(bits / 4294967296));
+  dv.setUint32(buf.length - 4, bits >>> 0);
+  const w = new Int32Array(64);
+  const h = H.slice();
+  for (let off = 0; off < buf.length; off += 64) {
+    for (let i = 0; i < 16; i++) w[i] = dv.getInt32(off + i * 4);
+    for (let i = 16; i < 64; i++) {
+      const x = w[i - 15], y = w[i - 2];
+      w[i] = (w[i - 16] + (rotr(x, 7) ^ rotr(x, 18) ^ (x >>> 3)) + w[i - 7] + (rotr(y, 17) ^ rotr(y, 19) ^ (y >>> 10))) | 0;
+    }
+    let [a, b, c, d, e, f, g, hh] = h;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (hh + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const t2 = ((rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      hh = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    [a, b, c, d, e, f, g, hh].forEach((v, i) => { h[i] = (h[i] + v) | 0; });
+  }
+  return h.map((v) => (v >>> 0).toString(16).padStart(8, '0')).join('');
+}
+
+const ICON = {
+  camera: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  edit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  trash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>',
+  sheet: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="m8 12 5 6M13 12l-5 6"/></svg>',
+};
+
+// where the customer ID comes from; fg = text colour on the brand colour
+const PLATFORMS = [
+  { name: 'Instagram', c: '#E1306C', id: '@username' },
+  { name: 'TikTok', c: '#111827', id: '@username' },
+  { name: 'Facebook', c: '#1877F2', id: 'Profile name or link' },
+  { name: 'WhatsApp', c: '#25D366', id: 'Name or number' },
+  { name: 'Telegram', c: '#229ED9', id: '@username' },
+  { name: 'Snapchat', c: '#FFFC00', fg: '#111827', id: 'Username' },
+  { name: 'X', c: '#000000', id: '@handle' },
+  { name: 'YouTube', c: '#FF0000', id: 'Channel name' },
+  { name: 'Phone call', c: '#64748B', id: 'Customer name' },
+  { name: 'Website', c: '#0F766E', id: 'Name or email' },
+];
+const PLATFORM_KEY = 'acp4u_platform';
+const platformOf = (name) => PLATFORMS.find((p) => p.name.toLowerCase() === String(name || '').trim().toLowerCase());
+const platformTag = (name) => {
+  if (!name) return '';
+  const p = platformOf(name) || { name, c: '#475569' };
+  return `<span class="ptag" style="--c:${p.c};${p.fg ? `--fg:${p.fg}` : ''}">${esc(p.name)}</span>`;
+};
+
+// suggestions only — anything can be typed
+const CATALOG = {
+  'Peugeot': ['206', '206 SD', '207', '207 Automatic', '405', 'Pars', 'Pars ELX', '2008', '301', '508'],
+  'Iran Khodro': ['Samand', 'Soren', 'Soren Plus', 'Dena', 'Dena Plus', 'Runna', 'Runna Plus', 'Tara', 'Rira', 'Arisan'],
+  'Saipa': ['Pride 111', 'Pride 131', 'Pride 132', 'Tiba', 'Tiba 2', 'Saina', 'Quick', 'Shahin', 'Atlas'],
+  'Renault': ['Tondar 90 (L90)', 'Sandero', 'Sandero Stepway', 'Megane', 'Duster', 'Captur', 'Symbol', 'Talisman', 'Koleos'],
+  'Kia': ['Rio', 'Picanto', 'Cerato', 'Optima', 'Cadenza', 'Sportage', 'Sorento', 'Mohave', 'Soul', 'Carnival'],
+  'Hyundai': ['Accent', 'i10', 'i20', 'i30', 'Elantra', 'Sonata', 'Azera', 'Genesis', 'Tucson', 'Santa Fe', 'Veracruz', 'Kona'],
+  'Toyota': ['Yaris', 'Corolla', 'Aurion', 'Camry', 'RAV4', 'C-HR', 'Prado', 'Land Cruiser', 'Hilux', 'Fortuner', 'Prius'],
+  'Nissan': ['Sunny', 'Teana', 'Maxima', 'Juke', 'Qashqai', 'X-Trail', 'Murano', 'Patrol', 'Navara'],
+  'Mazda': ['Mazda 2', 'Mazda 3', 'Mazda 6', 'CX-3', 'CX-5', 'CX-9'],
+  'Mitsubishi': ['Lancer', 'ASX', 'Outlander', 'Pajero', 'L200'],
+  'Honda': ['Civic', 'Accord', 'CR-V'],
+  'Suzuki': ['Swift', 'Vitara', 'Grand Vitara', 'Kizashi'],
+  'Lexus': ['ES', 'IS', 'GS', 'NX', 'RX', 'LX'],
+  'Mercedes-Benz': ['C200', 'C250', 'E200', 'E250', 'E350', 'S500', 'ML350', 'GLC', 'GLE'],
+  'BMW': ['3 Series', '5 Series', '7 Series', 'X1', 'X3', 'X5', 'X6'],
+  'Volkswagen': ['Golf', 'Jetta', 'Passat', 'Tiguan', 'Beetle'],
+  'Chevrolet': ['Cruze', 'Epica', 'Captiva', 'Spark'],
+  'Chery': ['Tiggo 5', 'Tiggo 7', 'Tiggo 8', 'Arrizo 5', 'Arrizo 6', 'Arrizo 8'],
+  'MVM': ['110', '315', '530', '550', 'X22', 'X33', 'X55'],
+  'JAC': ['J4', 'J5', 'S3', 'S5', 'S7', 'T8'],
+  'KMC': ['J7', 'K7', 'T8', 'X5'],
+  'Haval': ['H2', 'H6', 'Jolion'],
+  'Haima': ['S5', 'S7', '8S'],
+  'Geely': ['Emgrand', 'Coolray', 'Azkarra'],
+  'Brilliance': ['H220', 'H230', 'H320', 'H330', 'C3'],
+  'Lifan': ['X50', 'X60', '620', '820'],
+  'Dongfeng': ['H30 Cross', 'AX7', 'S30'],
+  'Fidelity': ['Prestige', 'Excellent'],
+  'Dignity': ['Prestige', 'Prime'],
+  'Fownix': ['Tiggo 7 Pro', 'Tiggo 8 Pro', 'Arrizo 6 Pro'],
+};
+
+/* =================================================================== UI helpers */
+function toast(msg, type = 'info', ms = 3400) {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  $('#toasts').appendChild(el);
+  requestAnimationFrame(() => el.classList.add('in'));
+  setTimeout(() => { el.classList.remove('in'); setTimeout(() => el.remove(), 250); }, ms);
+}
+
+const busy = {
+  show(text) { $('#busyText').textContent = text; $('#busyBar').style.width = '0%'; $('#busy').hidden = false; },
+  progress(done, total, text) {
+    if (text) $('#busyText').textContent = text;
+    $('#busyBar').style.width = `${total ? Math.round((done / total) * 100) : 100}%`;
+  },
+  hide() { $('#busy').hidden = true; },
+};
+
+function openDialog({ title, html, ok = 'OK', cancel = 'Cancel', danger = false }) {
+  return new Promise((resolve) => {
+    const ov = $('#dlg');
+    ov.innerHTML = `<div class="dialog" role="dialog" aria-modal="true"><h3>${esc(title)}</h3><div class="dlg-body">${html}</div>
+      <div class="dlg-actions">${cancel ? `<button type="button" class="btn light" data-cancel>${esc(cancel)}</button>` : ''}
+      <button type="button" class="btn ${danger ? 'danger' : 'primary'}" data-ok>${esc(ok)}</button></div></div>`;
+    ov.hidden = false;
+    const close = (v) => {
+      ov.hidden = true;
+      ov.innerHTML = '';
+      document.removeEventListener('keydown', onKey, true);
+      resolve(v);
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(false); }
+      else if (e.key === 'Enter' && !e.target.matches('[data-cancel]')) { e.preventDefault(); e.stopPropagation(); close(true); }
+    };
+    document.addEventListener('keydown', onKey, true);
+    ov.querySelector('[data-ok]').onclick = () => close(true);
+    const c = ov.querySelector('[data-cancel]');
+    if (c) c.onclick = () => close(false);
+    ov.onclick = (e) => { if (e.target === ov) close(false); };
+    ov.querySelector('[data-ok]').focus();
+  });
+}
+
+function download(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+}
+
+async function pool(items, size, fn) {
+  let next = 0;
+  const worker = async () => { while (next < items.length) { const it = items[next++]; await fn(it); } };
+  await Promise.all(Array.from({ length: Math.min(size, items.length) }, worker));
+}
+
+/* =================================================================== images */
+function loadImg(blob) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const im = new Image();
+    im.onload = () => { URL.revokeObjectURL(url); resolve(im); };
+    im.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+    im.src = url;
+  });
+}
+
+// downscale in halving steps for a clean result, flatten onto white (JPEG has no alpha)
+function scaleTo(src, max) {
+  const W = src.naturalWidth || src.width, H = src.naturalHeight || src.height;
+  const s = Math.min(1, max / Math.max(W, H));
+  const tw = Math.max(1, Math.round(W * s)), th = Math.max(1, Math.round(H * s));
+  let cur = src, cw = W, ch = H;
+  while (cw / 2 > tw && ch / 2 > th) {
+    const c = document.createElement('canvas');
+    c.width = Math.round(cw / 2); c.height = Math.round(ch / 2);
+    const x = c.getContext('2d');
+    x.imageSmoothingQuality = 'high';
+    x.drawImage(cur, 0, 0, c.width, c.height);
+    cur = c; cw = c.width; ch = c.height;
+  }
+  const out = document.createElement('canvas');
+  out.width = tw; out.height = th;
+  const x = out.getContext('2d');
+  x.fillStyle = '#fff';
+  x.fillRect(0, 0, tw, th);
+  x.imageSmoothingQuality = 'high';
+  x.drawImage(cur, 0, 0, tw, th);
+  return out;
+}
+const toJpeg = (canvas, q) => new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('jpeg'))), 'image/jpeg', q));
+
+async function processImage(file) {
+  const img = await loadImg(file);
+  const fullC = scaleTo(img, 1600);
+  const full = await toJpeg(fullC, 0.86);
+  const xl = await toJpeg(scaleTo(fullC, 640), 0.84);
+  return { full, xl, w: fullC.width, h: fullC.height };
+}
+
+/* =================================================================== storage: in the browser (IndexedDB) */
+const idb = {
+  db: null,
+  urls: new Map(),
+  async init() {
+    if (!('indexedDB' in window)) throw new Error('this browser has no local database');
+    this.db = await new Promise((resolve, reject) => {
+      const rq = indexedDB.open('acp4u-parts', 2);
+      rq.onupgradeneeded = () => {
+        const db = rq.result;
+        if (!db.objectStoreNames.contains('records')) db.createObjectStore('records', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('meta')) db.createObjectStore('meta');
+      };
+      rq.onsuccess = () => resolve(rq.result);
+      rq.onerror = () => reject(rq.error || new Error('IndexedDB'));
+      rq.onblocked = () => reject(new Error('the app is open in another tab — close the other tab'));
+    });
+    try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch (_) { /* optional */ }
+  },
+  tx(name, mode, fn) {
+    return new Promise((resolve, reject) => {
+      const t = this.db.transaction(name, mode);
+      let out;
+      const rq = fn(t.objectStore(name));
+      if (rq) rq.onsuccess = () => { out = rq.result; };
+      t.oncomplete = () => resolve(out);
+      const fail = () => {
+        const e = t.error || (rq && rq.error);
+        reject(e && e.name === 'QuotaExceededError'
+          ? new Error('Browser storage is full. Make a backup and delete old rows.')
+          : (e || new Error('Storage error')));
+      };
+      t.onerror = fail;
+      t.onabort = fail;
+    });
+  },
+  async list() {
+    for (const u of this.urls.values()) URL.revokeObjectURL(u);
+    this.urls.clear();
+    return (await this.tx('records', 'readonly', (os) => os.getAll())) || [];
+  },
+  photoUrl(r, i, size) {
+    const p = r.photos[i];
+    if (!p) return '';
+    const key = `${r.id}:${i}:${size}:${r.updatedAt}`;
+    let u = this.urls.get(key);
+    if (!u) { u = URL.createObjectURL(p[size] || p.full); this.urls.set(key, u); }
+    return u;
+  },
+  async photoBlob(r, i, size) { const p = r.photos[i]; return p[size] || p.full; },
+  slotUrl(r, i) { return { url: URL.createObjectURL(r.photos[i].xl || r.photos[i].full), own: true }; },
+  async save(input) {
+    const prev = input.id ? await this.tx('records', 'readonly', (os) => os.get(input.id)) : null;
+    const now = Date.now();
+    const ts = Number(input.createdAt);
+    const rec = {
+      id: (prev && prev.id) || input.id || newId(),
+      createdAt: (prev && prev.createdAt) || (ts > 946684800000 && ts < now + 864e5 ? ts : now),
+      updatedAt: now,
+      exportedAt: Number(input.exportedAt) || null, // an edited row counts as not exported again
+      photos: [],
+    };
+    FIELDS.forEach((k) => { rec[k] = String(input[k] ?? '').trim(); });
+    for (let i = 0; i < SLOTS; i++) {
+      const p = input.photos[i];
+      if (p && p.state === 'keep' && prev && prev.photos && prev.photos[i]) rec.photos[i] = prev.photos[i];
+      else if (p && p.state === 'new') rec.photos[i] = { w: p.w, h: p.h, full: p.full, xl: p.xl };
+      else rec.photos[i] = null;
+    }
+    await this.tx('records', 'readwrite', (os) => os.put(rec));
+    return rec;
+  },
+  remove(id) { return this.tx('records', 'readwrite', (os) => os.delete(id)); },
+  markExported(ids, ts) {
+    return this.tx('records', 'readwrite', (os) => {
+      ids.forEach((id) => {
+        const g = os.get(id);
+        g.onsuccess = () => { if (g.result) { g.result.exportedAt = ts; os.put(g.result); } };
+      });
+    });
+  },
+  getMeta(key) { return this.tx('meta', 'readonly', (os) => os.get(key)); },
+  setMeta(key, val) { return this.tx('meta', 'readwrite', (os) => os.put(val, key)); },
+  delMeta(key) { return this.tx('meta', 'readwrite', (os) => os.delete(key)); },
+};
+
+/* =================================================================== storage: on disk (Linux app, acp4u_parts.py on 127.0.0.1) */
+const disk = { token: '', home: '', exports: '', backups: '', alive: true };
+
+class ApiError extends Error {}
+async function api(method, url, body, raw = false) {
+  const opt = { method, headers: { 'X-ACP4U-Token': disk.token }, cache: 'no-store' };
+  if (body !== undefined) {
+    if (raw) opt.body = body;
+    else { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+  }
+  let res;
+  try { res = await fetch(url, opt); } catch (_) { serviceDown(); throw new ApiError('The ACP4U Parts app service is not running — open ACP4U Parts again from your applications menu.'); }
+  serviceUp();
+  const type = res.headers.get('Content-Type') || '';
+  if (!type.includes('application/json')) {
+    if (!res.ok) throw new ApiError(`Service error (${res.status})`);
+    return res;
+  }
+  const data = await res.json();
+  if (!res.ok || !data.ok) { const e = new ApiError(data.error || `Service error (${res.status})`); e.code = data.code; throw e; }
+  return data;
+}
+const blobToB64 = (blob) => new Promise((resolve, reject) => {
+  const fr = new FileReader();
+  fr.onload = () => resolve(String(fr.result).split(',')[1] || '');
+  fr.onerror = () => reject(fr.error);
+  fr.readAsDataURL(blob);
+});
+
+const diskRecords = {
+  async list() { return (await api('GET', '/api/records')).records; },
+  photoUrl(r, i, size) {
+    return r.photos[i] ? `/api/photo?id=${r.id}&i=${i}&s=${size}&v=${r.updatedAt}&t=${disk.token}` : '';
+  },
+  async photoBlob(r, i, size) { return (await api('GET', this.photoUrl(r, i, size))).blob(); },
+  slotUrl(r, i) { return { url: this.photoUrl(r, i, 'xl'), own: false }; },
+  async save(input) {
+    const photos = await Promise.all(input.photos.map(async (p) => {
+      if (!p) return null;
+      if (p.state === 'keep') return { state: 'keep' };
+      return { state: 'new', w: p.w, h: p.h, full: await blobToB64(p.full), xl: await blobToB64(p.xl || p.full) };
+    }));
+    const body = { id: input.id || '', createdAt: input.createdAt || 0, exportedAt: input.exportedAt || 0, photos };
+    FIELDS.forEach((k) => { body[k] = String(input[k] ?? ''); });
+    return (await api('POST', '/api/records', body)).record;
+  },
+  async remove(id) { await api('POST', '/api/records/delete', { id }); },
+  async markExported(ids, ts) { await api('POST', '/api/records/exported', { ids, ts }); },
+};
+
+/* rows go to IndexedDB or to disk; drafts and small settings always stay in IndexedDB */
+let records = idb;
+const store = {
+  get db() { return idb.db; },
+  init: () => idb.init(),
+  list: () => records.list(),
+  save: (input) => records.save(input),
+  remove: (id) => records.remove(id),
+  markExported: (ids, ts) => records.markExported(ids, ts),
+  photoUrl: (r, i, size) => records.photoUrl(r, i, size),
+  photoBlob: (r, i, size) => records.photoBlob(r, i, size),
+  slotUrl: (r, i) => records.slotUrl(r, i),
+  getMeta: (key) => idb.getMeta(key),
+  setMeta: (key, val) => idb.setMeta(key, val),
+  delMeta: (key) => idb.delMeta(key),
+};
+
+/* =================================================================== state */
+let started = false;
+let formGen = 0;
+let draftTimer = 0;
+const state = {
+  records: [],      // ascending by date added (Excel order)
+  rowNo: new Map(), // id -> row number
+  filtered: [],
+  q: '',
+  period: 'all',
+  status: 'all',
+  shown: 60,
+  editingId: null,
+  photos: Array(SLOTS).fill(null), // {state:'new'|'keep'|'loading', url, own, full, xl, w, h}
+  dirty: false,
+};
+
+function fixRecord(r) {
+  FIELDS.forEach((k) => { r[k] = r[k] == null ? '' : String(r[k]); });
+  r.createdAt = Number(r.createdAt) || 0;
+  r.updatedAt = Number(r.updatedAt) || r.createdAt;
+  r.exportedAt = Number(r.exportedAt) || null;
+  const ph = Array.isArray(r.photos) ? r.photos : [];
+  r.photos = Array.from({ length: SLOTS }, (_, i) => ph[i] || null);
+  return r;
+}
+
+async function reload() {
+  const list = (await store.list()).map(fixRecord);
+  list.sort((a, b) => a.createdAt - b.createdAt || (a.id < b.id ? -1 : 1));
+  state.records = list;
+  state.rowNo = new Map(list.map((r, i) => [r.id, i + 1]));
+  refreshDatalists();
+  renderStats();
+  renderList();
+  updateFormMode();
+  updateCustHint();
+}
+
+/* =================================================================== form */
+const field = (k) => $(`#f-${k}`);
+
+function readForm() {
+  return Object.fromEntries(FIELDS.map((k) => [k, NORMALIZE[k](field(k).value)]));
+}
+
+function validate(d) {
+  let first = null;
+  FIELDS.forEach((k) => field(k).closest('.field').classList.remove('invalid'));
+  REQUIRED.forEach((k) => {
+    if (!d[k]) { field(k).closest('.field').classList.add('invalid'); first = first || k; }
+  });
+  if (first) { field(first).focus(); toast(`Please fill in “${LABELS[first]}”.`, 'error'); return false; }
+  return true;
+}
+
+function updateFormMode() {
+  const editing = !!state.editingId;
+  $('#formCard').classList.toggle('editing', editing);
+  $('#btnCancelEdit').hidden = !editing;
+  $('#btnClear').hidden = editing;
+  $('#btnSaveTxt').textContent = editing ? 'Save changes' : 'Save & add row';
+  const n = editing ? state.rowNo.get(state.editingId) : state.records.length + 1;
+  $('#formTitle').textContent = editing ? `Edit row ${n || ''}` : 'New request';
+  $('#nextRow').textContent = editing ? 'Editing' : `Row ${n}`;
+}
+
+function releaseSlot(p) { if (p && p.own && p.url) URL.revokeObjectURL(p.url); }
+
+function markDirty() {
+  state.dirty = true;
+  scheduleDraft();
+}
+
+function renderPlatforms() {
+  const v = field('platform').value;
+  const known = platformOf(v);
+  const other = !!v && !known;
+  $('#plats').innerHTML = PLATFORMS.map((p) =>
+    `<button type="button" class="plat${known === p ? ' on' : ''}" role="radio" aria-checked="${known === p}" data-plat="${esc(p.name)}" style="--c:${p.c};${p.fg ? `--fg:${p.fg}` : ''}"><i></i>${esc(p.name)}</button>`).join('') +
+    `<button type="button" class="plat${other ? ' on' : ''}" role="radio" aria-checked="${other}" data-plat="" style="--c:#475569"><i></i>Other…</button>`;
+  const oi = $('#platOther');
+  oi.hidden = !other && !oi.dataset.open;
+  if (other) oi.value = v;
+  field('customerId').placeholder = known ? known.id : '@username';
+}
+function setPlatform(v, remember) {
+  field('platform').value = v;
+  if (remember) { try { localStorage.setItem(PLATFORM_KEY, v); } catch (_) { /* optional */ } }
+  renderPlatforms();
+}
+function lastPlatform() { try { return localStorage.getItem(PLATFORM_KEY) || ''; } catch (_) { return ''; } }
+
+function resetForm() {
+  formGen++;
+  state.photos.forEach(releaseSlot);
+  state.photos = Array(SLOTS).fill(null);
+  FIELDS.forEach((k) => { field(k).value = ''; field(k).closest('.field').classList.remove('invalid'); });
+  delete $('#platOther').dataset.open;
+  $('#platOther').value = '';
+  setPlatform(lastPlatform());
+  state.editingId = null;
+  state.dirty = false;
+  clearTimeout(draftTimer);
+  if (store.db) store.delMeta('draft').catch(() => {});
+  renderSlots();
+  updateVinHint();
+  updateCustHint();
+  refreshModels();
+  updateFormMode();
+}
+
+/* the entry being typed is kept as a draft, so closing the page never loses it */
+function scheduleDraft() {
+  if (state.editingId || !started) return;
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(saveDraft, 500);
+}
+function saveDraft() {
+  if (state.editingId || !store.db) return;
+  const fields = Object.fromEntries(FIELDS.map((k) => [k, field(k).value]));
+  const photos = state.photos.map((p) => (p && p.state === 'new' ? { full: p.full, xl: p.xl, w: p.w, h: p.h } : null));
+  const empty = !FIELDS.some((k) => k !== 'platform' && fields[k].trim()) && !photos.some(Boolean);
+  (empty ? store.delMeta('draft') : store.setMeta('draft', { fields, photos, at: Date.now() })).catch(() => {});
+}
+async function restoreDraft() {
+  const d = await store.getMeta('draft').catch(() => null);
+  if (!d || !d.fields) return;
+  FIELDS.forEach((k) => { field(k).value = d.fields[k] || ''; });
+  renderPlatforms();
+  state.photos = Array.from({ length: SLOTS }, (_, i) => {
+    const p = d.photos && d.photos[i];
+    return p && p.full ? { state: 'new', full: p.full, xl: p.xl || p.full, w: p.w, h: p.h, url: URL.createObjectURL(p.xl || p.full), own: true } : null;
+  });
+  state.dirty = true;
+  renderSlots();
+  updateVinHint();
+  updateCustHint();
+  refreshModels();
+  toast('Your unsaved entry was restored — finish it and press Save.', 'info', 4500);
+}
+
+function renderSlots() {
+  $('#photos').innerHTML = state.photos.map((p, i) => {
+    const n = i + 1;
+    if (!p) {
+      return `<div class="slot vacant" data-i="${i}" tabindex="0" role="button" aria-label="Add photo ${n}">
+        <span class="slot-plus">${ICON.camera}</span><span class="slot-lbl">Photo ${n}</span></div>`;
+    }
+    if (p.state === 'loading') {
+      return `<div class="slot loading" data-i="${i}"><span class="spinner sm"></span><span class="slot-lbl">Processing…</span></div>`;
+    }
+    return `<div class="slot filled" data-i="${i}" tabindex="0" role="button" title="Click to replace photo ${n}">
+      <img src="${esc(p.url)}" alt="Photo ${n}"><span class="slot-n">${n}</span>
+      <button type="button" class="slot-x" data-x="${i}" aria-label="Remove photo ${n}" title="Remove photo">×</button></div>`;
+  }).join('');
+}
+
+let pickFrom = 0;
+function pickPhotos(i) {
+  pickFrom = i;
+  const fp = $('#filePick');
+  fp.value = '';
+  fp.click();
+}
+
+async function addFiles(files, start = 0, replaceStart = false) {
+  const imgs = files.filter((f) => /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|bmp|heic|heif|avif|jfif)$/i.test(f.name || ''));
+  if (!imgs.length) { if (files.length) toast('That file is not an image.', 'error'); return; }
+  const targets = [];
+  if (replaceStart && state.photos[start] && state.photos[start].state !== 'loading') targets.push(start);
+  for (let k = 0; k < SLOTS && targets.length < imgs.length; k++) {
+    const i = (start + k) % SLOTS;
+    if (!state.photos[i] && !targets.includes(i)) targets.push(i);
+  }
+  if (!targets.length) { toast('All 5 photo boxes are full — remove one, or click a photo to replace it.', 'warn'); return; }
+  if (targets.length < imgs.length) toast(`Only ${plural(targets.length, 'free box')} left; the other images were skipped.`, 'warn');
+
+  const gen = formGen;
+  const prev = targets.map((i) => state.photos[i]);
+  targets.forEach((i) => { state.photos[i] = { state: 'loading' }; });
+  renderSlots();
+  for (let k = 0; k < targets.length; k++) {
+    const i = targets[k];
+    let next = prev[k] || null;
+    try {
+      const p = await processImage(imgs[k]);
+      if (gen !== formGen) return;
+      releaseSlot(prev[k]);
+      next = { state: 'new', ...p, url: URL.createObjectURL(p.xl), own: true };
+    } catch (_) {
+      if (gen !== formGen) return;
+      toast(`Could not read “${imgs[k].name || 'pasted image'}” (unsupported format).`, 'error', 4500);
+    }
+    state.photos[i] = next;
+    renderSlots();
+    markDirty();
+  }
+}
+
+function removePhoto(i) {
+  releaseSlot(state.photos[i]);
+  state.photos[i] = null;
+  renderSlots();
+  markDirty();
+}
+
+function updateVinHint() {
+  const v = enDigits(field('vin').value).toUpperCase().replace(/[\s-]/g, '');
+  const cnt = $('#vinCount');
+  cnt.textContent = `${v.length}/17`;
+  let msg = '';
+  if (v && /[^A-Z0-9]/.test(v)) msg = 'A VIN only contains English letters and digits.';
+  else if (/[IOQ]/.test(v)) msg = 'VINs never use I, O or Q — it is probably 1 or 0.';
+  else if (v && v.length !== 17) msg = 'A VIN is normally 17 characters long.';
+  $('#vinHint').textContent = msg;
+  cnt.classList.toggle('ok', v.length === 17 && !msg);
+}
+
+function updateCustHint() {
+  const el = $('#custHint');
+  const key = custKey(field('customerId').value);
+  if (!key) { el.textContent = ''; return; }
+  const n = state.records.filter((r) => r.id !== state.editingId && custKey(r.customerId) === key).length;
+  el.innerHTML = n ? `This customer has ${plural(n, 'earlier request')} — <button type="button" id="showCust">show</button>` : '';
+}
+
+function refreshDatalists() {
+  const brands = new Set(Object.keys(CATALOG));
+  state.records.forEach((r) => { if (r.brand) brands.add(r.brand); });
+  $('#dlBrands').innerHTML = [...brands].map((b) => `<option value="${esc(b)}">`).join('');
+  const places = [...new Set(state.records.map((r) => r.location).filter(Boolean))].sort();
+  $('#dlLocations').innerHTML = places.map((x) => `<option value="${esc(x)}">`).join('');
+  refreshModels();
+}
+
+function refreshModels() {
+  const b = norm(field('brand').value);
+  const models = new Set();
+  Object.entries(CATALOG).forEach(([k, list]) => { if (b && norm(k) === b) list.forEach((m) => models.add(m)); });
+  state.records.forEach((r) => { if (r.model && (!b || norm(r.brand) === b)) models.add(r.model); });
+  $('#dlModels').innerHTML = [...models].map((m) => `<option value="${esc(m)}">`).join('');
+}
+
+async function confirmDiscard() {
+  if (!state.dirty) return true;
+  return openDialog({
+    title: 'Discard this entry?',
+    html: 'The form has information that has not been saved as a row yet.',
+    ok: 'Discard',
+    danger: true,
+  });
+}
+
+async function startEdit(id) {
+  const r = state.records.find((x) => x.id === id);
+  if (!r) return;
+  if (state.editingId !== id && !(await confirmDiscard())) return;
+  resetForm();
+  state.editingId = id;
+  FIELDS.forEach((k) => { field(k).value = r[k] || ''; });
+  renderPlatforms();
+  state.photos = r.photos.map((p, i) => (p ? { state: 'keep', w: p.w, h: p.h, ...store.slotUrl(r, i) } : null));
+  renderSlots();
+  updateVinHint();
+  updateCustHint();
+  refreshModels();
+  updateFormMode();
+  $('#formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => field('customerId').focus({ preventScroll: true }), 350);
+}
+
+async function onSubmit(e) {
+  e.preventDefault();
+  if ($('#btnSave').disabled) return;
+  const d = readForm();
+  if (!validate(d)) return;
+  if (state.photos.some((p) => p && p.state === 'loading')) { toast('One moment — photos are still being processed.', 'warn'); return; }
+  const photos = state.photos.map((p) => {
+    if (!p) return null;
+    if (p.state === 'keep') return { state: 'keep' };
+    return { state: 'new', full: p.full, xl: p.xl, w: p.w, h: p.h };
+  });
+  const wasEdit = !!state.editingId;
+  $('#btnSave').disabled = true;
+  try {
+    const rec = await store.save({ id: state.editingId || undefined, ...d, photos });
+    if (!wasEdit && d.platform) setPlatform(d.platform, true);
+    resetForm();
+    await reload();
+    const n = state.rowNo.get(rec.id);
+    toast(wasEdit ? `Row ${n} updated.` : `Row ${n} saved ✓`, 'ok');
+    flashRow(rec.id);
+    field('customerId').focus();
+  } catch (err) {
+    toast(err.message || 'Saving failed.', 'error', 5000);
+  } finally {
+    $('#btnSave').disabled = false;
+  }
+}
+
+/* =================================================================== list */
+function applyFilter() {
+  const q = norm(state.q);
+  const sod = startOfToday();
+  const from = state.period === 'today' ? sod : state.period === '7' ? sod - 6 * 864e5 : state.period === '30' ? sod - 29 * 864e5 : 0;
+  state.filtered = state.records.filter((r) => r.createdAt >= from &&
+    (state.status === 'all' || (state.status === 'new' ? !r.exportedAt : !!r.exportedAt)) &&
+    (!q || norm(FIELDS.map((k) => r[k]).join(' ')).includes(q)));
+}
+
+function rowHtml(r) {
+  const dash = '<span class="muted">—</span>';
+  const thumbs = r.photos.map((p, i) => (p
+    ? `<button type="button" class="th" data-view="${r.id}" data-i="${i}" title="Photo ${i + 1}"><img loading="lazy" src="${esc(store.photoUrl(r, i, 'xl'))}" alt=""></button>`
+    : '')).join('');
+  const d = new Date(r.createdAt);
+  const chip = r.exportedAt
+    ? `<span class="chip done" title="Exported ${fmtDate.format(new Date(r.exportedAt))} ${fmtTime.format(new Date(r.exportedAt))}">Exported ${fmtShort.format(new Date(r.exportedAt))}</span>`
+    : '<span class="chip new">Not exported</span>';
+  return `<tr data-id="${r.id}">
+    <td data-l="No."><span class="rn">${state.rowNo.get(r.id)}</span></td>
+    <td data-l="Customer ID" class="strong"><div><bdi>${esc(r.customerId)}</bdi>${r.platform ? `<br>${platformTag(r.platform)}` : ''}</div></td>
+    <td data-l="Phone">${r.phone ? `<a href="tel:${esc(r.phone)}">${esc(r.phone)}</a>` : dash}</td>
+    <td data-l="Country / City">${r.location ? `<bdi>${esc(r.location)}</bdi>` : dash}</td>
+    <td data-l="Car"><div><b><bdi>${esc(r.brand)}</bdi></b><div class="sub"><bdi>${esc(r.model)}</bdi></div></div></td>
+    <td data-l="Year">${esc(r.year)}</td>
+    <td data-l="VIN code" class="mono">${r.vin ? esc(r.vin) : dash}</td>
+    <td data-l="Required part" class="part"><bdi>${esc(r.part).replace(/\n/g, '<br>')}</bdi></td>
+    <td data-l="Photos"><div class="thumbs">${thumbs || dash}</div></td>
+    <td data-l="Added" class="date"><div>${fmtDate.format(d)} <span class="muted">${fmtTime.format(d)}</span><br>${chip}</div></td>
+    <td class="acts"><button type="button" class="ib" data-edit="${r.id}" title="Edit">${ICON.edit}</button><button type="button" class="ib danger" data-del="${r.id}" title="Delete">${ICON.trash}</button></td>
+  </tr>`;
+}
+
+function renderList() {
+  applyFilter();
+  const view = state.filtered.slice().reverse().slice(0, state.shown);
+  $('#tbody').innerHTML = view.map(rowHtml).join('');
+  const none = !state.filtered.length;
+  $('#empty').hidden = !none;
+  $('#tbl').hidden = none;
+  if (none) {
+    const any = state.records.length > 0;
+    $('#emptyTitle').textContent = any ? 'No rows match these filters' : 'No rows yet';
+    $('#emptyText').textContent = any ? 'Change the search text or the filters.' : 'Add the first request with the form above.';
+  }
+  $('#moreWrap').hidden = state.filtered.length <= state.shown;
+  $('#exportCount').textContent = state.filtered.length;
+  $('#btnExport').disabled = none;
+}
+
+function renderStats() {
+  const sod = startOfToday();
+  $('#stTotal').textContent = state.records.length;
+  $('#stToday').textContent = state.records.filter((r) => r.createdAt >= sod).length;
+  $('#stPending').textContent = state.records.filter((r) => !r.exportedAt).length;
+  $('#stPhotos').textContent = state.records.reduce((a, r) => a + r.photos.filter(Boolean).length, 0);
+}
+
+function flashRow(id) {
+  const tr = document.querySelector(`#tbody tr[data-id="${id}"]`);
+  if (!tr) return;
+  tr.classList.remove('flash');
+  void tr.offsetWidth;
+  tr.classList.add('flash');
+}
+
+async function deleteRec(id) {
+  const r = state.records.find((x) => x.id === id);
+  if (!r) return;
+  const ok = await openDialog({
+    title: 'Delete row',
+    html: `Delete row <b>${state.rowNo.get(id)}</b> — <bdi>${esc(r.customerId)}</bdi> (<bdi>${esc(r.part.slice(0, 60))}</bdi>) and its photos?<br><span class="muted">This cannot be undone; the rows after it move up by one.</span>`,
+    ok: 'Delete',
+    danger: true,
+  });
+  if (!ok) return;
+  try {
+    await store.remove(id);
+    if (state.editingId === id) resetForm();
+    await reload();
+    toast('Row deleted.', 'ok');
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+/* =================================================================== lightbox */
+const lb = { items: [], pos: 0 }; // items: [{url, caption, name}]
+function openViewer(items, pos) {
+  if (!items.length) return;
+  lb.items = items;
+  lb.pos = Math.min(Math.max(0, pos), items.length - 1);
+  $('#lb').hidden = false;
+  showLb();
+}
+function openLightbox(id, i) {
+  const r = state.records.find((x) => x.id === id);
+  if (!r) return;
+  const idx = r.photos.map((p, k) => (p ? k : -1)).filter((k) => k >= 0);
+  const head = `Row ${state.rowNo.get(r.id)} • ${r.customerId} • ${r.brand} ${r.model} • ${r.part.split('\n')[0]}`;
+  openViewer(idx.map((k) => ({
+    url: store.photoUrl(r, k, 'full'),
+    caption: `${head} — photo ${k + 1}`,
+    name: `ACP4U-${safeName(r.customerId)}-${k + 1}.jpg`,
+  })), idx.indexOf(i));
+}
+function showLb() {
+  const it = lb.items[lb.pos];
+  $('#lbImg').src = it.url;
+  $('#lbCap').textContent = `${it.caption} (${lb.pos + 1} of ${lb.items.length})`;
+  $('#lbDl').href = it.url;
+  $('#lbDl').download = it.name;
+  $('#lbPrev').hidden = lb.pos === 0;
+  $('#lbNext').hidden = lb.pos >= lb.items.length - 1;
+}
+function closeLightbox() { $('#lb').hidden = true; $('#lbImg').removeAttribute('src'); }
+function lbStep(d) {
+  const p = lb.pos + d;
+  if (p < 0 || p >= lb.items.length) return;
+  lb.pos = p;
+  showLb();
+}
+
+/* =================================================================== excel / backup */
+function filterLabel() {
+  const parts = [];
+  if (state.status !== 'all') parts.push(state.status === 'new' ? 'not exported before' : 'exported before');
+  if (state.period !== 'all') parts.push({ today: 'added today', 7: 'last 7 days', 30: 'last 30 days' }[state.period]);
+  if (state.q.trim()) parts.push(`search “${state.q.trim()}”`);
+  return parts.length ? `   |   Filter: ${parts.join(', ')}` : '';
+}
+
+async function exportExcel() {
+  const rows = state.filtered;
+  if (!rows.length) { toast('There are no rows to export.', 'warn'); return; }
+  await folder.ensure(); // ask for folder permission now, while the click still counts as a user action
+  const hq = $('#hq').checked;
+  const out = rows.map((r) => ({
+    ref: r.id,
+    ...Object.fromEntries(FIELDS.map((k) => [k, r[k]])),
+    photos: Array(SLOTS).fill(null),
+  }));
+  const jobs = [];
+  rows.forEach((r, k) => r.photos.forEach((p, i) => { if (p) jobs.push({ r, k, i, p }); }));
+  busy.show(jobs.length ? 'Preparing photos…' : 'Building the Excel file…');
+  let done = 0, missing = 0;
+  try {
+    await pool(jobs, 6, async (j) => {
+      try {
+        const blob = await store.photoBlob(j.r, j.i, hq ? 'full' : 'xl');
+        out[j.k].photos[j.i] = { bytes: new Uint8Array(await blob.arrayBuffer()), w: j.p.w, h: j.p.h };
+      } catch (_) {
+        missing++;
+      }
+      done++;
+      busy.progress(done, jobs.length, `Preparing photos: ${done} of ${jobs.length}`);
+    });
+    busy.show('Building the Excel file…');
+    busy.progress(1, 1);
+    await sleep(40);
+    const now = new Date();
+    const chunks = ACPX.buildPartsXlsx({
+      rows: out,
+      brand: 'ACP4U',
+      title: 'Customer Parts Requests',
+      subtitle: `Report date: ${fmtDate.format(now)}, ${fmtTime.format(now)}   |   Rows: ${rows.length}${filterLabel()}`,
+    });
+    const where = await saveOutput('Exports', `ACP4U-Parts_${stampDT(now)}`, '.xlsx', new Blob(chunks, { type: XLSX_MIME }));
+    await store.markExported(rows.map((r) => r.id), now.getTime());
+    await reload();
+    toast(`${plural(rows.length, 'row')} exported${where ? ` to ${where}` : ''} — marked as exported.`, 'ok', 6000);
+    if (missing) toast(`${plural(missing, 'photo')} could not be read and were left out.`, 'warn', 5000);
+  } catch (err) {
+    toast(`Export failed: ${err.message}`, 'error', 5000);
+  } finally {
+    busy.hide();
+  }
+}
+
+function downloadTemplate() {
+  const chunks = ACPX.buildPartsXlsx({
+    rows: [],
+    blankRows: 30,
+    brand: 'ACP4U',
+    title: 'Customer Parts Requests',
+    subtitle: 'Blank form — one request per row; place the part photos in the Photo 1–5 columns',
+  });
+  download(new Blob(chunks, { type: XLSX_MIME }), 'ACP4U-Parts-Form.xlsx');
+}
+
+async function showBackupInfo() {
+  const t = await store.getMeta('lastBackup').catch(() => null);
+  $('#backupInfo').textContent = t ? `Last backup: ${fmtDate.format(new Date(t))}` : 'No backup yet';
+}
+
+async function backup() {
+  if (!state.records.length) { toast('There is nothing to back up yet.', 'warn'); return; }
+  const recs = state.records;
+  const files = [];
+  const meta = recs.map((r) => ({
+    id: r.id, createdAt: r.createdAt, updatedAt: r.updatedAt, exportedAt: r.exportedAt,
+    ...Object.fromEntries(FIELDS.map((k) => [k, r[k]])),
+    photos: r.photos.map((p) => (p ? { w: p.w, h: p.h } : null)),
+  }));
+  const jobs = [];
+  recs.forEach((r) => r.photos.forEach((p, i) => { if (p) { jobs.push({ r, i, s: 'full' }); jobs.push({ r, i, s: 'xl' }); } }));
+  await folder.ensure();
+  busy.show('Collecting rows and photos…');
+  let done = 0;
+  try {
+    await pool(jobs, 6, async (j) => {
+      try {
+        const b = await store.photoBlob(j.r, j.i, j.s);
+        files.push({ name: `photos/${j.r.id}_${j.i}_${j.s}.jpg`, data: new Uint8Array(await b.arrayBuffer()) });
+      } catch (_) { /* skip unreadable photo */ }
+      busy.progress(++done, jobs.length, `Collecting photos: ${done} of ${jobs.length}`);
+    });
+    files.unshift({ name: 'records.json', data: JSON.stringify({ app: 'acp4u-parts', version: 1, exportedAt: Date.now(), records: meta }) });
+    const where = await saveOutput('Backups', `ACP4U-Backup_${stampDT(new Date())}`, '.zip', new Blob(ACPX.zip(files), { type: 'application/zip' }));
+    await store.setMeta('lastBackup', Date.now()).catch(() => {});
+    showBackupInfo();
+    toast(`Backup of ${plural(recs.length, 'row')} saved${where ? ` to ${where}` : ''}. Copy it somewhere safe now and then.`, 'ok', 6000);
+  } catch (err) {
+    toast(`Backup failed: ${err.message}`, 'error');
+  } finally {
+    busy.hide();
+  }
+}
+
+async function restoreFrom(file) {
+  let entries, data;
+  try {
+    entries = await ACPX.unzipAsync(new Uint8Array(await file.arrayBuffer()));
+    data = JSON.parse(new TextDecoder().decode(entries['records.json']));
+    if (!data || data.app !== 'acp4u-parts' || !Array.isArray(data.records)) throw new Error('bad');
+  } catch (_) {
+    toast('This file is not a backup made by this app.', 'error');
+    return;
+  }
+  const have = new Set(state.records.map((r) => r.id));
+  const todo = data.records.filter((r) => r && /^[a-f0-9]{16}$/.test(r.id) && !have.has(r.id));
+  const ok = await openDialog({
+    title: 'Restore from backup',
+    html: `The file holds ${plural(data.records.length, 'row')}. <b>${plural(todo.length, 'new row')}</b> will be added; rows that already exist here are left untouched.`,
+    ok: todo.length ? 'Restore' : 'OK',
+    cancel: todo.length ? 'Cancel' : '',
+  });
+  if (!ok || !todo.length) return;
+  busy.show('Restoring…');
+  let added = 0, failed = 0;
+  for (const r of todo) {
+    try {
+      const photos = Array.from({ length: SLOTS }, (_, i) => {
+        const p = (r.photos || [])[i];
+        const full = entries[`photos/${r.id}_${i}_full.jpg`];
+        if (!p || !full) return null;
+        const xl = entries[`photos/${r.id}_${i}_xl.jpg`] || full;
+        return { state: 'new', full: new Blob([full], { type: 'image/jpeg' }), xl: new Blob([xl], { type: 'image/jpeg' }), w: p.w, h: p.h };
+      });
+      await store.save({ id: r.id, createdAt: r.createdAt, exportedAt: r.exportedAt, ...Object.fromEntries(FIELDS.map((k) => [k, String(r[k] ?? '')])), photos });
+      added++;
+    } catch (_) {
+      failed++;
+    }
+    busy.progress(added + failed, todo.length, `Restoring: ${added + failed} of ${todo.length}`);
+  }
+  busy.hide();
+  await reload().catch(() => {});
+  toast(`${plural(added, 'row')} restored${failed ? `, ${failed} failed` : ''}.`, failed ? 'warn' : 'ok', 5000);
+}
+
+/* =================================================================== exports folder (Chrome / Edge) */
+const R_NS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+
+async function fileExists(dir, name) {
+  try { await dir.getFileHandle(name); return true; } catch (e) {
+    if (e.name === 'NotFoundError') return false;
+    if (e.name === 'TypeMismatchError') return true; // a folder with that name
+    throw e;
+  }
+}
+
+async function writeFile(handle, blob) {
+  const w = await handle.createWritable();
+  try {
+    await w.write(blob);
+    await w.close();
+  } catch (e) {
+    try { await w.abort(); } catch (_) { /* already closed */ }
+    throw e;
+  }
+}
+
+async function listXlsx(dir, prefix) {
+  const out = [];
+  for await (const [name, h] of dir.entries()) {
+    if (h.kind === 'directory') {
+      if (!/^backups$/i.test(name)) out.push(...await listXlsx(h, `${prefix}${name}/`));
+    } else if (/\.xlsx$/i.test(name) && !name.startsWith('~$')) {
+      out.push({ path: prefix + name, name, handle: h });
+    }
+  }
+  return out;
+}
+
+class ChangedError extends Error {}
+
+/* A folder the user picks in Chrome/Edge (File System Access) — used when index.html is opened directly. */
+const browserFolder = {
+  kind: 'browser',
+  supported: typeof window.showDirectoryPicker === 'function',
+  root: null, // the folder the user picked (normally acp4u-parts)
+  ok: false,  // read/write permission granted in this session
+  async load() {
+    if (!this.supported) return;
+    try {
+      this.root = (await store.getMeta('exportDir')) || null;
+      this.ok = !!this.root && (await this.root.queryPermission({ mode: 'readwrite' })) === 'granted';
+    } catch (_) { this.root = null; this.ok = false; }
+  },
+  async choose() {
+    const h = await window.showDirectoryPicker({ id: 'acp4u-exports', mode: 'readwrite', startIn: 'desktop' });
+    this.ok = (await h.queryPermission({ mode: 'readwrite' })) === 'granted' || (await h.requestPermission({ mode: 'readwrite' })) === 'granted';
+    this.root = h;
+    await store.setMeta('exportDir', h);
+    fileIndex.clear();
+  },
+  // after a restart the browser may want a fresh OK; this must run straight from a click
+  async ensure() {
+    if (this.supported && this.root && !this.ok) {
+      try { this.ok = (await this.root.requestPermission({ mode: 'readwrite' })) === 'granted'; } catch (_) { /* needs a click */ }
+      renderFolderInfo();
+    }
+    return this.ok;
+  },
+  inExports() { return /^exports$/i.test(this.root.name); },
+  async dir(sub) {
+    if (sub === 'Exports' && this.inExports()) return this.root;
+    return this.root.getDirectoryHandle(sub, { create: true });
+  },
+  label(sub) { return sub === 'Exports' && this.inExports() ? this.root.name : `${this.root.name}/${sub}`; },
+  async save(sub, base, ext, blob) {
+    const dir = await this.dir(sub);
+    let name = `${base}${ext}`;
+    for (let n = 2; await fileExists(dir, name); n++) name = `${base}_${n}${ext}`;
+    await writeFile(await dir.getFileHandle(name, { create: true }), blob);
+    return `${this.label(sub)}/${name}`;
+  },
+  // -> [{path, name, lastModified, size, handle}]
+  async listFiles() {
+    const out = [];
+    for (const f of await listXlsx(await this.dir('Exports'), '')) {
+      const file = await f.handle.getFile();
+      out.push({ ...f, lastModified: file.lastModified, size: file.size });
+    }
+    return out;
+  },
+  async readFile(f) {
+    const file = await f.handle.getFile();
+    return { bytes: new Uint8Array(await file.arrayBuffer()), lastModified: file.lastModified, size: file.size };
+  },
+  async writeFile(f, blob) { await writeFile(f.handle, blob); },
+};
+
+/* The ~/ACP4U-Parts folder of the Linux app — reached through the local app service. */
+const diskFolder = {
+  kind: 'disk',
+  supported: true,
+  root: { name: 'ACP4U-Parts' },
+  ok: true,
+  async load() {},
+  async ensure() { return true; },
+  label(sub) { return sub === 'Backups' ? disk.backups : disk.exports; },
+  async save(sub, base, ext, blob) {
+    const q = new URLSearchParams({ sub, base, ext });
+    return (await api('POST', `/api/save?${q}`, blob, true)).path;
+  },
+  async listFiles() { return (await api('GET', '/api/files')).files; },
+  async readFile(f) {
+    const res = await api('GET', `/api/file?${new URLSearchParams({ path: f.path })}`);
+    return { bytes: new Uint8Array(await res.arrayBuffer()), lastModified: +res.headers.get('X-Last-Modified'), size: +res.headers.get('X-Size') };
+  },
+  async writeFile(f, blob) {
+    const q = new URLSearchParams({ path: f.path, lastModified: f.lastModified, size: f.size });
+    try {
+      await api('POST', `/api/file?${q}`, blob, true);
+    } catch (err) {
+      if (err.code === 'changed') throw new ChangedError(err.message);
+      throw err;
+    }
+  },
+  open(sub) { return api('POST', '/api/open', { sub }); },
+};
+
+let folder = browserFolder;
+
+/** Saves into the exports folder when one is connected, otherwise downloads. Returns the saved path or null. */
+async function saveOutput(sub, base, ext, blob) {
+  if (folder.ok) {
+    try {
+      return await folder.save(sub, base, ext, blob);
+    } catch (err) {
+      if (err.name === 'NotAllowedError' || err.name === 'SecurityError') { folder.ok = false; renderFolderInfo(); }
+      toast(`Could not save into the folder (${err.message}) — downloading instead.`, 'warn', 6000);
+    }
+  }
+  download(blob, `${base}${ext}`);
+  return null;
+}
+
+function renderFolderInfo() {
+  const b = $('#folderBanner'), t = $('#folderText'), btn = $('#btnFolder');
+  b.hidden = false;
+  btn.hidden = false;
+  b.className = 'banner warn primary-btn';
+  if (folder.kind === 'disk') {
+    b.className = 'banner info';
+    t.innerHTML = `Excel files are saved in <b>${esc(disk.exports)}</b>, backups in <b>${esc(disk.backups)}</b>.`;
+    btn.textContent = 'Open exports folder';
+  } else if (!folder.supported) {
+    t.innerHTML = 'Saving into a folder and searching Excel files need <b>Google Chrome</b> or <b>Microsoft Edge</b> — in this browser files go to Downloads.';
+    btn.hidden = true;
+  } else if (!folder.root) {
+    t.innerHTML = 'Choose a folder once: every Excel export is then saved there automatically (date &amp; time in the name) and becomes searchable.';
+    btn.textContent = 'Choose exports folder';
+  } else if (!folder.ok) {
+    t.innerHTML = `The browser needs your OK again to use <b>${esc(folder.label('Exports'))}</b>.`;
+    btn.textContent = 'Reconnect folder';
+  } else {
+    b.className = 'banner info';
+    t.innerHTML = `Excel files are saved in <b>${esc(folder.label('Exports'))}</b>, backups in <b>${esc(folder.label('Backups'))}</b>.`;
+    btn.textContent = 'Change folder';
+  }
+}
+
+async function onFolderButton() {
+  try {
+    if (folder.kind === 'disk') {
+      await folder.open('Exports');
+    } else if (folder.root && !folder.ok) {
+      if (await folder.ensure()) toast('Folder reconnected.', 'ok');
+    } else {
+      if (!folder.root) {
+        const go = await openDialog({
+          title: 'Choose the exports folder',
+          html: 'Select the <b>acp4u-parts</b> folder (the one with index.html) and let the browser edit files there. Excel exports go into an <b>Exports</b> folder inside it and backups into <b>Backups</b>.',
+          ok: 'Choose folder',
+        });
+        if (!go) return;
+      }
+      await folder.choose();
+      toast(`Exports will be saved in ${folder.label('Exports')}.`, 'ok', 4500);
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError') toast(`Folder error: ${err.message}`, 'error', 5000);
+  }
+  renderFolderInfo();
+}
+
+/* =================================================================== search & edit inside the Excel files */
+const fileIndex = new Map();  // relative path -> {path, name, handle, lastModified, size, sheets, error}
+const mediaCache = new Map(); // `${path}|${lastModified}` -> Map(media part -> object URL)
+const search = { results: [], editKey: null };
+const mimeOf = (p) => (/\.png$/i.test(p) ? 'image/png' : /\.gif$/i.test(p) ? 'image/gif' : 'image/jpeg');
+const xmlEsc = (s) => String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function resolvePart(from, target) {
+  if (target.startsWith('/')) return target.slice(1);
+  const parts = from.split('/').slice(0, -1);
+  for (const seg of target.split('/')) {
+    if (seg === '..') parts.pop();
+    else if (seg && seg !== '.') parts.push(seg);
+  }
+  return parts.join('/');
+}
+
+/** Reads every sheet of an .xlsx (ours or saved by Excel/WPS): cell text per row, header row, photo anchors. */
+async function readWorkbook(bytes) {
+  const entries = await ACPX.unzipAsync(bytes);
+  const dec = new TextDecoder();
+  const parse = (p) => (entries[p] ? new DOMParser().parseFromString(dec.decode(entries[p]), 'application/xml') : null);
+  const all = (el, tag) => (el ? [...el.getElementsByTagNameNS('*', tag)] : []);
+  const text = (el, tag) => { const x = all(el, tag)[0]; return x ? x.textContent : ''; };
+  const relsOf = (p) => {
+    const i = p.lastIndexOf('/');
+    const m = {};
+    all(parse(`${p.slice(0, i)}/_rels/${p.slice(i + 1)}.rels`), 'Relationship').forEach((r) => {
+      m[r.getAttribute('Id')] = { target: resolvePart(p, r.getAttribute('Target') || ''), type: r.getAttribute('Type') || '' };
+    });
+    return m;
+  };
+  const sst = all(parse('xl/sharedStrings.xml'), 'si')
+    .map((si) => all(si, 't').filter((t) => t.parentNode.localName !== 'rPh').map((t) => t.textContent).join(''));
+  const wbRels = relsOf('xl/workbook.xml');
+  const sheets = [];
+  for (const s of all(parse('xl/workbook.xml'), 'sheet')) {
+    const rel = wbRels[s.getAttributeNS(R_NS, 'id') || s.getAttribute('r:id')];
+    if (!rel || !entries[rel.target]) continue;
+    const rows = [];
+    let lastR = 0;
+    for (const rowEl of all(parse(rel.target), 'row')) {
+      const r = +rowEl.getAttribute('r') || lastR + 1;
+      lastR = r;
+      const cells = {};
+      let lastC = -1;
+      for (const c of all(rowEl, 'c')) {
+        const ref = c.getAttribute('r');
+        const col = ref ? ACPX.colIndex(ref) : lastC + 1;
+        lastC = col;
+        const t = c.getAttribute('t');
+        let v;
+        if (t === 's') v = sst[+text(c, 'v')] ?? '';
+        else if (t === 'inlineStr') v = all(c, 't').map((x) => x.textContent).join('');
+        else if (t === 'b') v = text(c, 'v') === '1' ? 'TRUE' : 'FALSE';
+        else v = text(c, 'v');
+        if (v !== '') cells[col] = v;
+      }
+      if (Object.keys(cells).length) rows.push({ r, cells });
+    }
+    // header = first row with 3+ filled cells (row 3 in our files, under the title rows)
+    const head = rows.slice(0, 15).find((row) => Object.keys(row.cells).length >= 3);
+    const headerRow = head ? head.r : 0;
+    const header = head ? head.cells : {};
+    const skip = new Set();
+    const photoCols = new Set();
+    let refCol = null;
+    Object.keys(header).forEach((c) => {
+      const l = String(header[c]).trim().toLowerCase();
+      if (l === 'ref') { refCol = +c; skip.add(+c); }
+      else if (/^(no\.?|#)$/.test(l)) skip.add(+c);
+      else if (/^photo\s*\d+$/.test(l)) photoCols.add(+c);
+    });
+    // photos anchored on this sheet: Excel row number -> [{col, media}]
+    const images = {};
+    const drawing = Object.values(relsOf(rel.target)).find((x) => /\/drawing$/.test(x.type));
+    if (drawing && entries[drawing.target]) {
+      const dDoc = parse(drawing.target);
+      const dRels = relsOf(drawing.target);
+      for (const a of [...all(dDoc, 'twoCellAnchor'), ...all(dDoc, 'oneCellAnchor')]) {
+        const from = all(a, 'from')[0];
+        const blip = all(a, 'blip')[0];
+        const embed = blip && (blip.getAttributeNS(R_NS, 'embed') || blip.getAttribute('r:embed'));
+        const media = embed && dRels[embed] && dRels[embed].target;
+        if (!from || !media || !entries[media]) continue;
+        const row = +text(from, 'row') + 1;
+        (images[row] = images[row] || []).push({ col: +text(from, 'col'), media });
+      }
+      Object.values(images).forEach((list) => list.sort((x, y) => x.col - y.col));
+    }
+    sheets.push({ name: s.getAttribute('name') || 'Sheet', path: rel.target, headerRow, header, skip, photoCols, refCol, images, rows: rows.filter((row) => row.r > headerRow) });
+  }
+  return { sheets };
+}
+
+/** Writes `val` into one cell of a sheet's XML, keeping the cell's style; everything else stays byte-for-byte. */
+function setCellText(xml, col, rowNum, val) {
+  const ref = `${col}${rowNum}`;
+  const make = (s) => (val === '' ? `<c r="${ref}"${s}/>` : `<c r="${ref}"${s} t="inlineStr"><is><t xml:space="preserve">${xmlEsc(val)}</t></is></c>`);
+  const m = new RegExp(`<c\\b(?=[^>]*\\sr="${ref}")([^>]*?)(?:/>|>[\\s\\S]*?</c>)`).exec(xml);
+  if (m) {
+    const s = /\ss="(\d+)"/.exec(m[1]);
+    return xml.slice(0, m.index) + make(s ? ` s="${s[1]}"` : '') + xml.slice(m.index + m[0].length);
+  }
+  if (val === '') return xml;
+  const rm = new RegExp(`<row\\b(?=[^>]*\\sr="${rowNum}")[^>]*?(/?)>`).exec(xml);
+  if (!rm) throw new Error(`row ${rowNum} was not found in the sheet`);
+  if (rm[1] === '/') return xml.slice(0, rm.index) + rm[0].replace(/\s*\/>$/, '>') + make('') + '</row>' + xml.slice(rm.index + rm[0].length);
+  const start = rm.index + rm[0].length;
+  const end = xml.indexOf('</row>', start);
+  const inner = xml.slice(start, end);
+  const target = ACPX.colIndex(col);
+  let pos = inner.length;
+  const re = /<c\b[^>]*?\sr="([A-Z]+)\d+"/g;
+  for (let mm = re.exec(inner); mm; mm = re.exec(inner)) {
+    if (ACPX.colIndex(mm[1]) > target) { pos = mm.index; break; }
+  }
+  return xml.slice(0, start) + inner.slice(0, pos) + make('') + inner.slice(pos) + xml.slice(end);
+}
+
+let indexQueue = Promise.resolve();
+function refreshIndex() {
+  indexQueue = indexQueue.then(doIndex, doIndex);
+  return indexQueue;
+}
+async function doIndex() {
+  const st = $('#spStatus');
+  if (!folder.supported || !folder.root || !folder.ok) { renderSearchGate(); return; }
+  $('#spGate').hidden = true;
+  $('#spFolder').textContent = `Every Excel file in ${folder.label('Exports')}`;
+  try {
+    const files = await folder.listFiles();
+    const seen = new Set();
+    let k = 0;
+    for (const f of files) {
+      k++;
+      seen.add(f.path);
+      const old = fileIndex.get(f.path);
+      if (old && old.lastModified === f.lastModified && old.size === f.size) continue;
+      st.textContent = `Reading ${f.path} (${k} of ${files.length})…`;
+      let book, stat = f;
+      try {
+        const got = await folder.readFile(f);
+        stat = { ...f, lastModified: got.lastModified, size: got.size };
+        book = await readWorkbook(got.bytes);
+      } catch (err) { book = { sheets: [], error: err.message }; }
+      fileIndex.set(f.path, { ...stat, ...book });
+    }
+    for (const p of [...fileIndex.keys()]) if (!seen.has(p)) fileIndex.delete(p);
+    const list = [...fileIndex.values()];
+    const rows = list.reduce((a, f) => a + f.sheets.reduce((b, sh) => b + sh.rows.length, 0), 0);
+    const bad = list.filter((f) => f.error).length;
+    st.textContent = list.length
+      ? `${plural(list.length, 'Excel file')} • ${plural(rows, 'row')} searchable${bad ? ` • ${bad} could not be read` : ''}`
+      : `No Excel files in ${folder.label('Exports')} yet — export some rows first.`;
+  } catch (err) {
+    st.textContent = `Could not read the folder: ${err.message}`;
+    if (err.name === 'NotAllowedError') { folder.ok = false; renderFolderInfo(); renderSearchGate(); return; }
+  }
+  if (!search.editKey) runSearch();
+}
+
+function renderSearchGate() {
+  $('#spGate').hidden = false;
+  $('#spResults').innerHTML = '';
+  $('#spStatus').textContent = '';
+  const set = (title, text, btn) => {
+    $('#spGateTitle').textContent = title;
+    $('#spGateText').textContent = text;
+    $('#spGateBtn').textContent = btn || '';
+    $('#spGateBtn').hidden = !btn;
+  };
+  if (!folder.supported) set('This browser cannot read folders', 'Open index.html in Google Chrome or Microsoft Edge to search inside Excel files.');
+  else if (!folder.root) set('Choose the exports folder first', 'Pick the acp4u-parts folder — every Excel file in its Exports folder is searched.', 'Choose exports folder');
+  else set('Allow access to the folder', `The browser needs your OK to read ${folder.label('Exports')}.`, 'Allow access');
+}
+
+async function openSearch() {
+  await folder.ensure();
+  $('#searchPanel').hidden = false;
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => $('#spQ').focus(), 30);
+  refreshIndex();
+}
+function closeSearch() {
+  $('#searchPanel').hidden = true;
+  document.body.style.overflow = '';
+  search.editKey = null;
+}
+
+const cellLabel = (sh, col) => String(sh.header[col] || '').trim() || `Column ${ACPX.colName(col)}`;
+const fieldKey = (sh, col) => LABEL_KEY[cellLabel(sh, col).toLowerCase()];
+function editableCols(sh, row) {
+  const cols = new Set([...Object.keys(sh.header), ...Object.keys(row.cells)].map(Number));
+  return [...cols].filter((c) => !sh.skip.has(c) && !sh.photoCols.has(c)).sort((a, b) => a - b);
+}
+
+function runSearch() {
+  const tokens = norm($('#spQ').value).split(' ').filter(Boolean);
+  const out = [];
+  if (tokens.length) {
+    const files = [...fileIndex.values()].sort((a, b) => b.lastModified - a.lastModified || b.path.localeCompare(a.path)); // newest first
+    scan: for (const f of files) {
+      for (const [si, sh] of f.sheets.entries()) {
+        for (const row of sh.rows) {
+          const hay = norm(Object.entries(row.cells).filter(([c]) => !sh.skip.has(+c)).map(([, v]) => v).join(' '));
+          if (tokens.every((t) => hay.includes(t))) {
+            out.push({ key: `${f.path}|${si}|${row.r}`, f, sh, row });
+            if (out.length >= 300) break scan;
+          }
+        }
+      }
+    }
+  }
+  search.results = out;
+  search.editKey = null;
+  renderResults(tokens);
+}
+
+function hl(text, tokens) {
+  let html = esc(text);
+  tokens.forEach((t) => {
+    const re = new RegExp(esc(t).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+    html = html.replace(re, (m) => `\u0001${m}\u0002`);
+  });
+  return html.replace(/\u0001/g, '<mark>').replace(/\u0002/g, '</mark>');
+}
+
+function resultHtml(res, tokens) {
+  const { sh, row } = res;
+  const noCol = Object.keys(sh.header).find((c) => /^(no\.?|#)$/i.test(String(sh.header[c]).trim()));
+  const no = noCol != null ? row.cells[noCol] : '';
+  const fields = editableCols(sh, row).filter((c) => row.cells[c]).map((c) =>
+    `<div class="sp-f${fieldKey(sh, c) === 'part' ? ' part' : ''}"><span>${esc(cellLabel(sh, c))}</span><div>${hl(row.cells[c], tokens)}</div></div>`).join('');
+  const thumbs = (sh.images[row.r] || []).map((im, k) =>
+    `<button type="button" class="th" data-sp-photo="${k}" title="Photo ${k + 1}"><img alt="" data-media="${esc(im.media)}"></button>`).join('');
+  return `<div class="sp-row" data-key="${esc(res.key)}">
+    <div class="sp-row-head"><span class="rn">Excel row ${row.r}</span>${no ? `<span class="muted">No. ${esc(no)}</span>` : ''}${res.f.sheets.length > 1 ? `<span class="muted">Sheet: ${esc(sh.name)}</span>` : ''}
+      <button type="button" class="btn light sm" data-sp-edit>${ICON.edit} Edit</button></div>
+    <div class="sp-fields">${fields || '<span class="muted">(no text)</span>'}</div>
+    <div class="thumbs sp-thumbs">${thumbs}</div>
+  </div>`;
+}
+
+function renderResults(tokens) {
+  const box = $('#spResults');
+  if (!$('#spGate').hidden) return;
+  if (!tokens.length) {
+    box.innerHTML = fileIndex.size
+      ? `<div class="sp-empty"><b>Type to search ${plural(fileIndex.size, 'Excel file')}</b>Customer ID, phone, car, VIN or part — every match shows its file and row, and can be edited.</div>`
+      : '';
+    return;
+  }
+  if (!search.results.length) { box.innerHTML = '<div class="sp-empty"><b>No matches</b>Try fewer or different words.</div>'; return; }
+  const groups = new Map();
+  search.results.forEach((r) => { if (!groups.has(r.f.path)) groups.set(r.f.path, []); groups.get(r.f.path).push(r); });
+  box.innerHTML = [...groups.values()].map((list) => {
+    const f = list[0].f;
+    const sub = f.path.slice(0, f.path.length - f.name.length);
+    const when = new Date(f.lastModified);
+    return `<section class="sp-file" data-path="${esc(f.path)}">
+      <div class="sp-file-head">${ICON.sheet}<div><b>${esc(f.name)}</b><div class="muted">${esc(folder.label('Exports'))}/${esc(sub)} • last saved ${fmtDate.format(when)} ${fmtTime.format(when)}</div></div>
+      <span class="pill">${plural(list.length, 'match', 'matches')}</span></div>
+      ${list.map((r) => resultHtml(r, tokens)).join('')}</section>`;
+  }).join('') + (search.results.length >= 300 ? '<div class="sp-empty">Showing the first 300 matches — add more words to narrow it down.</div>' : '');
+  groups.forEach((list) => loadThumbs(list[0].f));
+}
+
+async function loadThumbs(f) {
+  const imgs = () => document.querySelectorAll(`.sp-file[data-path="${CSS.escape(f.path)}"] img[data-media]`);
+  const key = `${f.path}|${f.lastModified}`;
+  if (!mediaCache.has(key)) mediaCache.set(key, new Map());
+  const cache = mediaCache.get(key);
+  const missing = [...new Set([...imgs()].map((i) => i.dataset.media))].filter((m) => !cache.has(m));
+  if (missing.length) {
+    try {
+      const entries = await ACPX.unzipAsync((await folder.readFile(f)).bytes);
+      missing.forEach((m) => { if (entries[m] && !cache.has(m)) cache.set(m, URL.createObjectURL(new Blob([entries[m]], { type: mimeOf(m) }))); });
+    } catch (_) { return; }
+  }
+  imgs().forEach((img) => { const u = cache.get(img.dataset.media); if (u) img.src = u; });
+}
+
+function openResultPhotos(res, k) {
+  const cache = mediaCache.get(`${res.f.path}|${res.f.lastModified}`);
+  const items = (res.sh.images[res.row.r] || []).map((im, i) => ({
+    url: cache && cache.get(im.media),
+    caption: `${res.f.name} • Excel row ${res.row.r} — photo ${i + 1}`,
+    name: `${safeName(res.f.name.replace(/\.xlsx$/i, ''))}-row${res.row.r}-${i + 1}.jpg`,
+  }));
+  if (items.every((x) => x.url)) openViewer(items, k);
+}
+
+function startFileEdit(key) {
+  const res = search.results.find((r) => r.key === key);
+  const el = res && document.querySelector(`.sp-row[data-key="${CSS.escape(key)}"]`);
+  if (!el) return;
+  search.editKey = key;
+  const linked = res.sh.refCol != null && state.records.some((r) => r.id === res.row.cells[res.sh.refCol]);
+  el.classList.add('sp-edit');
+  el.innerHTML = `<div class="sp-row-head"><span class="rn">Editing Excel row ${res.row.r}</span><span class="muted">${esc(res.f.name)}</span></div>
+    <div class="grid">${editableCols(res.sh, res.row).map((c) => {
+      const v = res.row.cells[c] || '';
+      const k = fieldKey(res.sh, c);
+      const long = k === 'part' || v.length > 60 || v.includes('\n');
+      return `<label class="field${long ? ' wide' : ''}"><span>${esc(cellLabel(res.sh, c))}</span>${long
+        ? `<textarea data-col="${c}" rows="2">${esc(v)}</textarea>`
+        : `<input data-col="${c}" value="${esc(v)}"${k === 'vin' ? ' class="mono"' : ''}>`}</label>`;
+    }).join('')}</div>
+    <div class="form-actions"><button type="button" class="btn primary sm" data-sp-save>Save to Excel file</button><button type="button" class="btn light sm" data-sp-cancel>Cancel</button></div>
+    <p class="sp-note">${linked ? 'This row came from the app — its row in the app is updated too.' : 'Only the Excel file is changed.'} If the file is open in Excel, close it before saving.</p>`;
+  const first = el.querySelector('[data-col]');
+  if (first) first.focus();
+}
+
+async function saveFileEdit(key) {
+  const res = search.results.find((r) => r.key === key);
+  const el = res && document.querySelector(`.sp-row[data-key="${CSS.escape(key)}"]`);
+  if (!el) return;
+  const { f, sh, row } = res;
+  const changed = {};
+  for (const inp of el.querySelectorAll('[data-col]')) {
+    const col = +inp.dataset.col;
+    const k = fieldKey(sh, col);
+    const v = k ? NORMALIZE[k](inp.value) : inp.value.trim();
+    if (k && REQUIRED.includes(k) && !v) { toast(`“${cellLabel(sh, col)}” cannot be empty.`, 'error'); inp.focus(); return; }
+    if (v !== (row.cells[col] || '')) changed[col] = v;
+  }
+  if (!Object.keys(changed).length) { runSearch(); toast('Nothing was changed.'); return; }
+  busy.show('Saving the Excel file…');
+  try {
+    const file = await folder.readFile(f);
+    if (file.lastModified !== f.lastModified || file.size !== f.size) throw new ChangedError();
+    const entries = await ACPX.unzipAsync(file.bytes);
+    let xml = new TextDecoder().decode(entries[sh.path]);
+    Object.entries(changed).forEach(([col, v]) => { xml = setCellText(xml, ACPX.colName(+col), row.r, v); });
+    entries[sh.path] = new TextEncoder().encode(xml);
+    await folder.writeFile(f, new Blob(ACPX.zip(Object.keys(entries).map((name) => ({ name, data: entries[name] }))), { type: XLSX_MIME }));
+  } catch (err) {
+    busy.hide();
+    if (err instanceof ChangedError) {
+      search.editKey = null;
+      await refreshIndex();
+      toast('That file was changed outside the app — results were refreshed. Please edit again.', 'warn', 6000);
+      return;
+    }
+    const locked = err.code === 'locked' || /NoModificationAllowed|InvalidState|being used/i.test(`${err.name} ${err.message}`);
+    toast(locked ? 'Could not save — the file is open in Excel / LibreOffice. Close it there and save again.' : `Could not save: ${err.message}`, 'error', 7000);
+    return;
+  }
+  // keep the app in step when this Excel row came from the app
+  let synced = false;
+  const ref = sh.refCol != null ? row.cells[sh.refCol] : '';
+  const rec = ref && state.records.find((r) => r.id === ref);
+  if (rec) {
+    const upd = {};
+    Object.entries(changed).forEach(([col, v]) => { const k = fieldKey(sh, +col); if (k) upd[k] = v; });
+    if (Object.keys(upd).length) {
+      try {
+        await store.save({
+          id: rec.id, exportedAt: rec.exportedAt,
+          ...Object.fromEntries(FIELDS.map((k) => [k, rec[k]])), ...upd,
+          photos: rec.photos.map((p) => (p ? { state: 'keep' } : null)),
+        });
+        await reload();
+        synced = true;
+      } catch (err) {
+        toast(`The file was saved, but the app row was not updated: ${err.message}`, 'warn', 6000);
+      }
+    }
+  }
+  search.editKey = null;
+  busy.hide();
+  await refreshIndex();
+  const again = document.querySelector(`.sp-row[data-key="${CSS.escape(key)}"]`);
+  if (again) again.classList.add('saved');
+  toast(`Saved in ${f.name}, Excel row ${row.r}${synced ? ' — the app row was updated too' : ''}.`, 'ok', 6000);
+}
+
+/* =================================================================== sign-in */
+function readAuth() {
+  try { return sessionStorage.getItem(AUTH_KEY) || localStorage.getItem(AUTH_KEY); } catch (_) { return null; }
+}
+function writeAuth(remember) {
+  try {
+    sessionStorage.setItem(AUTH_KEY, AUTH_HASH);
+    if (remember) localStorage.setItem(AUTH_KEY, AUTH_HASH);
+  } catch (_) { /* storage blocked: sign in each time */ }
+}
+function clearAuth() {
+  try { sessionStorage.removeItem(AUTH_KEY); localStorage.removeItem(AUTH_KEY); } catch (_) { /* ignore */ }
+}
+
+function showAuth(note) {
+  $('#auth').hidden = false;
+  $('#authErr').textContent = note || '';
+  $('#authPw').value = '';
+  setTimeout(() => ($('#authUser').value ? $('#authPw') : $('#authUser')).focus(), 50);
+}
+
+async function onAuthSubmit(e) {
+  e.preventDefault();
+  const user = $('#authUser').value.trim().toLowerCase();
+  const pw = $('#authPw').value;
+  if (sha256Hex(`acp4u|${user}|${pw}`) !== AUTH_HASH) {
+    $('#authErr').textContent = 'Wrong username or password.';
+    const card = $('#authForm');
+    card.classList.remove('shake');
+    void card.offsetWidth;
+    card.classList.add('shake');
+    $('#authPw').select();
+    return;
+  }
+  writeAuth($('#authRemember').checked);
+  $('#auth').hidden = true;
+  $('#authPw').value = '';
+  if (!started) await start();
+}
+
+function logout() {
+  if (state.dirty && !state.editingId) saveDraft(); // the draft is kept for next time
+  clearAuth();
+  setTimeout(() => location.reload(), 150);
+}
+
+/* =================================================================== boot */
+function fatal(msg) {
+  const b = $('#infoBanner');
+  b.className = 'banner err';
+  $('#infoText').textContent = msg;
+  $('#backupInfo').textContent = '';
+  $('#btnBackup2').hidden = true;
+  $('#modeLabel').textContent = 'Storage unavailable';
+}
+
+/* The Linux app (acp4u_parts.py) serves this page on 127.0.0.1 and passes its key as #t=… */
+let diskInfo = null;
+async function detectDisk() {
+  if (!/^https?:$/.test(location.protocol)) return null;
+  const m = /(?:^#|&)t=([a-f0-9]{32,64})/.exec(location.hash);
+  let token = m ? m[1] : '';
+  if (m) {
+    try { localStorage.setItem('acp4u_token', token); } catch (_) { /* kept for this page only */ }
+    history.replaceState(null, '', location.pathname + location.search);
+  } else {
+    try { token = localStorage.getItem('acp4u_token') || ''; } catch (_) { /* no storage */ }
+  }
+  try {
+    const res = await fetch('/api/ping', { headers: { 'X-ACP4U-Token': token }, cache: 'no-store' });
+    const d = await res.json().catch(() => null);
+    if (!d || d.app !== 'acp4u-parts') return null;
+    return res.ok ? { ...d, token } : { denied: true };
+  } catch (_) {
+    return null;
+  }
+}
+
+let infoText = '';
+function serviceDown() {
+  if (!disk.alive) return;
+  disk.alive = false;
+  $('#infoBanner').className = 'banner err';
+  $('#infoText').textContent = 'The ACP4U Parts service has stopped. Open ACP4U Parts again from your applications menu (or run acp4u-parts) — nothing is lost.';
+  $('#btnBackup2').hidden = true;
+}
+function serviceUp() {
+  if (disk.alive) return;
+  disk.alive = true;
+  $('#infoBanner').className = 'banner info';
+  $('#infoText').textContent = infoText;
+  $('#btnBackup2').hidden = false;
+}
+
+async function start() {
+  if (diskInfo) {
+    Object.assign(disk, { token: diskInfo.token, home: diskInfo.home, exports: diskInfo.exports, backups: diskInfo.backups });
+    records = diskRecords;
+    folder = diskFolder;
+    $('#modeLabel').textContent = `Saved in ${disk.home} on this computer`;
+    // keeps the background service running while this window is open
+    setInterval(() => { api('GET', '/api/ping').then(serviceUp, () => {}); }, 60000);
+  }
+  try {
+    await store.init();
+  } catch (err) {
+    // on disk only the unsaved-entry draft lives in the browser, so carry on without it
+    if (!diskInfo) {
+      fatal(`This browser cannot store data for this page (${err.message || err}). Open index.html with Google Chrome or Microsoft Edge.`);
+      return;
+    }
+  }
+  started = true;
+  await reload();
+  await restoreDraft();
+  showBackupInfo();
+  await folder.load();
+  renderFolderInfo();
+  updateFormMode();
+  field('customerId').focus();
+}
+
+function wire() {
+  const form = $('#entryForm');
+  form.addEventListener('submit', onSubmit);
+  form.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.isComposing) return;
+    if (e.ctrlKey || e.metaKey) { e.preventDefault(); form.requestSubmit(); return; }
+    const t = e.target;
+    if (t.tagName === 'INPUT' && t.id.startsWith('f-')) {
+      e.preventDefault();
+      const order = FIELDS.map(field).filter((el) => el.type !== 'hidden');
+      const next = order[order.indexOf(t) + 1];
+      if (next) next.focus();
+    }
+  });
+  form.addEventListener('input', (e) => {
+    markDirty();
+    const f = e.target.closest('.field');
+    if (f) f.classList.remove('invalid');
+    if (e.target.id === 'f-vin') updateVinHint();
+    if (e.target.id === 'f-customerId') updateCustHint();
+    if (e.target.id === 'f-brand') refreshModels();
+  });
+  $('#custHint').addEventListener('click', (e) => {
+    if (e.target.id !== 'showCust') return;
+    e.preventDefault();
+    state.q = field('customerId').value.trim().replace(/^@+/, '');
+    $('#q').value = state.q;
+    state.period = 'all';
+    state.status = 'all';
+    document.querySelectorAll('#period button').forEach((b) => b.classList.toggle('on', b.dataset.p === 'all'));
+    document.querySelectorAll('#status button').forEach((b) => b.classList.toggle('on', b.dataset.s === 'all'));
+    state.shown = 60;
+    renderList();
+    $('#listCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  $('#plats').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-plat]');
+    if (!b) return;
+    const oi = $('#platOther');
+    if (b.dataset.plat) {
+      delete oi.dataset.open;
+      setPlatform(field('platform').value === b.dataset.plat ? '' : b.dataset.plat); // click again to clear
+      field('customerId').focus();
+    } else {
+      oi.dataset.open = '1';
+      setPlatform(NORMALIZE.platform(oi.value));
+      oi.hidden = false;
+      oi.focus();
+    }
+    if (state.editingId) state.dirty = true;
+    scheduleDraft();
+  });
+  $('#platOther').addEventListener('input', (e) => {
+    field('platform').value = NORMALIZE.platform(e.target.value);
+    e.stopPropagation();
+    markDirty();
+  });
+  $('#btnClear').addEventListener('click', async () => { if (await confirmDiscard()) { resetForm(); field('customerId').focus(); } });
+  $('#btnCancelEdit').addEventListener('click', () => { resetForm(); field('customerId').focus(); });
+
+  // photo boxes
+  const photos = $('#photos');
+  photos.addEventListener('click', (e) => {
+    const x = e.target.closest('[data-x]');
+    if (x) { e.stopPropagation(); removePhoto(+x.dataset.x); return; }
+    const slot = e.target.closest('.slot');
+    if (slot && !slot.classList.contains('loading')) pickPhotos(+slot.dataset.i);
+  });
+  photos.addEventListener('keydown', (e) => {
+    const slot = e.target.closest('.slot');
+    if (!slot) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickPhotos(+slot.dataset.i); }
+    if ((e.key === 'Delete' || e.key === 'Backspace') && slot.classList.contains('filled')) { e.preventDefault(); removePhoto(+slot.dataset.i); }
+  });
+  $('#filePick').addEventListener('change', (e) => addFiles([...e.target.files], pickFrom, true));
+
+  // drag & drop onto the form; stop the browser from opening dropped files anywhere else
+  const card = $('#formCard');
+  const hasFiles = (e) => e.dataTransfer && [...e.dataTransfer.types].includes('Files');
+  card.addEventListener('dragover', (e) => { if (hasFiles(e)) { e.preventDefault(); card.classList.add('drop'); } });
+  card.addEventListener('dragleave', (e) => { if (!card.contains(e.relatedTarget)) card.classList.remove('drop'); });
+  card.addEventListener('drop', (e) => {
+    if (!hasFiles(e)) return;
+    e.preventDefault();
+    card.classList.remove('drop');
+    const slot = e.target.closest('.slot');
+    addFiles([...e.dataTransfer.files], slot ? +slot.dataset.i : 0, !!slot);
+  });
+  window.addEventListener('dragover', (e) => { if (hasFiles(e)) e.preventDefault(); });
+  window.addEventListener('drop', (e) => { if (hasFiles(e)) e.preventDefault(); });
+
+  // paste screenshots / copied photos
+  document.addEventListener('paste', (e) => {
+    if (!$('#auth').hidden || !$('#dlg').hidden || !$('#lb').hidden || !$('#searchPanel').hidden || !started) return;
+    const files = [...((e.clipboardData && e.clipboardData.files) || [])].filter((f) => /^image\//.test(f.type));
+    if (!files.length) return;
+    e.preventDefault();
+    addFiles(files, 0);
+    toast(`${plural(files.length, 'image')} pasted.`, 'ok', 2000);
+  });
+
+  // list
+  let qTimer = 0;
+  $('#q').addEventListener('input', (e) => {
+    clearTimeout(qTimer);
+    qTimer = setTimeout(() => { state.q = e.target.value; state.shown = 60; renderList(); }, 150);
+  });
+  $('#period').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    state.period = b.dataset.p;
+    state.shown = 60;
+    document.querySelectorAll('#period button').forEach((x) => x.classList.toggle('on', x === b));
+    renderList();
+  });
+  $('#status').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    state.status = b.dataset.s;
+    state.shown = 60;
+    document.querySelectorAll('#status button').forEach((x) => x.classList.toggle('on', x === b));
+    renderList();
+  });
+  $('#btnMore').addEventListener('click', () => { state.shown += 60; renderList(); });
+  $('#tbody').addEventListener('click', (e) => {
+    const v = e.target.closest('[data-view]');
+    if (v) { openLightbox(v.dataset.view, +v.dataset.i); return; }
+    const ed = e.target.closest('[data-edit]');
+    if (ed) { startEdit(ed.dataset.edit); return; }
+    const del = e.target.closest('[data-del]');
+    if (del) deleteRec(del.dataset.del);
+  });
+  $('#btnExport').addEventListener('click', exportExcel);
+
+  // top bar
+  $('#btnTemplate').addEventListener('click', downloadTemplate);
+  $('#btnBackup').addEventListener('click', backup);
+  $('#btnBackup2').addEventListener('click', backup);
+  $('#btnRestore').addEventListener('click', () => { const r = $('#restorePick'); r.value = ''; r.click(); });
+  $('#restorePick').addEventListener('change', (e) => { if (e.target.files[0]) restoreFrom(e.target.files[0]); });
+  $('#btnLogout').addEventListener('click', logout);
+  $('#authForm').addEventListener('submit', onAuthSubmit);
+
+  // lightbox
+  $('#lbClose').addEventListener('click', closeLightbox);
+  $('#lbPrev').addEventListener('click', () => lbStep(-1));
+  $('#lbNext').addEventListener('click', () => lbStep(1));
+  $('#lb').addEventListener('click', (e) => { if (e.target.id === 'lb') closeLightbox(); });
+  document.addEventListener('keydown', (e) => {
+    if ($('#lb').hidden) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+    else if (e.key === 'ArrowLeft') lbStep(-1);
+    else if (e.key === 'ArrowRight') lbStep(1);
+  });
+
+  // exports folder + search inside Excel files
+  $('#btnFolder').addEventListener('click', onFolderButton);
+  $('#btnSearchFiles').addEventListener('click', openSearch);
+  $('#spClose').addEventListener('click', closeSearch);
+  $('#spRescan').addEventListener('click', async () => { await folder.ensure(); fileIndex.clear(); refreshIndex(); });
+  $('#spGateBtn').addEventListener('click', async () => { await onFolderButton(); refreshIndex(); });
+  let spTimer = 0;
+  $('#spQ').addEventListener('input', () => { clearTimeout(spTimer); spTimer = setTimeout(runSearch, 200); });
+  $('#spResults').addEventListener('click', (e) => {
+    const rowEl = e.target.closest('.sp-row');
+    if (!rowEl) return;
+    const key = rowEl.dataset.key;
+    if (e.target.closest('[data-sp-edit]')) {
+      if (search.editKey && search.editKey !== key) runSearch();
+      startFileEdit(key);
+    } else if (e.target.closest('[data-sp-save]')) {
+      saveFileEdit(key);
+    } else if (e.target.closest('[data-sp-cancel]')) {
+      runSearch();
+    } else {
+      const ph = e.target.closest('[data-sp-photo]');
+      const res = ph && search.results.find((r) => r.key === key);
+      if (res) openResultPhotos(res, +ph.dataset.spPhoto);
+    }
+  });
+  $('#spResults').addEventListener('keydown', (e) => {
+    const rowEl = e.target.closest('.sp-row.sp-edit');
+    if (!rowEl) return;
+    if (e.key === 'Escape') { e.preventDefault(); runSearch(); }
+    else if (e.key === 'Enter' && (e.target.tagName === 'INPUT' || e.ctrlKey)) { e.preventDefault(); saveFileEdit(rowEl.dataset.key); }
+  });
+  // capture phase: decide before the photo viewer / row editor react, so one Escape closes one thing
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || $('#searchPanel').hidden) return;
+    if ($('#lb').hidden && $('#dlg').hidden && $('#busy').hidden && !search.editKey) closeSearch();
+  }, true);
+
+  // edits to an existing row are not drafted, so warn before leaving mid-edit
+  window.addEventListener('beforeunload', (e) => {
+    if (state.editingId && state.dirty) { e.preventDefault(); e.returnValue = ''; }
+  });
+}
+
+async function boot() {
+  infoText = $('#infoText').textContent;
+  wire();
+  renderSlots();
+  setPlatform(lastPlatform());
+  updateFormMode();
+  if (typeof ACPX === 'undefined') { fatal('xlsx.js was not found — keep index.html and xlsx.js together in the same folder.'); return; }
+  diskInfo = await detectDisk();
+  if (diskInfo && diskInfo.denied) {
+    diskInfo = null;
+    fatal('This window was opened without the app key. Close it and open ACP4U Parts from your applications menu (or run acp4u-parts).');
+    return;
+  }
+  if (readAuth() === AUTH_HASH) start();
+  else showAuth();
+}
+
+boot();
+})();
+</script>
+</body>
+</html>

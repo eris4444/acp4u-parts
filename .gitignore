@@ -1,0 +1,12 @@
+# Allow-list: only the program files are ever tracked - never customer data
+# (Exports/, Backups/, other .xlsx files, ZIP backups).
+/*
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/index.html
+!/xlsx.js
+!/acp4u_parts.py
+!/install.sh
+!/icon.svg
+!/ACP4U-Parts-Form.xlsx

@@ -1,0 +1,3 @@
+# Linux needs LF line endings for the installer and the launcher
+* text=auto eol=lf
+*.xlsx binary
