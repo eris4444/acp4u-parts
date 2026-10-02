@@ -191,11 +191,19 @@
     { key: 'year',       label: 'Year',          width: 9 },
     { key: 'vin',        label: 'VIN Code',      width: 24 },
     { key: 'part',       label: 'Required Part', width: 32 },
+    { key: 'status',     label: 'Status',        width: 14 },
   ];
   for (let i = 1; i <= PHOTO_SLOTS; i++) {
     COLUMNS.push({ key: 'photo' + i, label: 'Photo ' + i, width: 18, photo: true });
   }
   const FIRST_PHOTO_COL = COLUMNS.findIndex((c) => c.photo);
+  const STATUS_COL = COLUMNS.findIndex((c) => c.key === 'status');
+  const STATUSES = [
+    { name: 'New',        font: '1F4E79', fill: 'DDEBF7' },
+    { name: 'In process', font: '9C5700', fill: 'FFEB9C' },
+    { name: 'Done',       font: '006100', fill: 'C6EFCE' },
+    { name: 'Cancelled',  font: '6B7280', fill: 'E5E7EB' },
+  ];
 
   const PAL = {
     navy900: '0F2741', navy700: '1E3A5F', navy500: '33507A', navyLine: '3A5A85',
@@ -276,7 +284,9 @@
       '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
       `<cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs>` +
       '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
-      '<dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium2" defaultPivotStyle="PivotStyleLight16"/>' +
+      `<dxfs count="${STATUSES.length}">${STATUSES.map((st) =>
+        `<dxf><font><b/><color rgb="FF${st.font}"/></font><fill><patternFill><bgColor rgb="FF${st.fill}"/></patternFill></fill></dxf>`).join('')}</dxfs>` +
+      '<tableStyles count="0" defaultTableStyle="TableStyleMedium2" defaultPivotStyle="PivotStyleLight16"/>' +
       '</styleSheet>';
   }
 
@@ -287,7 +297,7 @@
   /* ------------------------------------------------------------------ workbook */
 
   /**
-   * opt.rows: [{customerId, platform, phone, location, brand, model, year, vin, part, ref?,
+   * opt.rows: [{customerId, platform, phone, location, brand, model, year, vin, part, status, ref?,
    *             photos: [{bytes: Uint8Array, w?, h?} | null] (up to 5)}]
    *   ref = the app's row id; written to a hidden "Ref" column so edits made
    *   from the file search can find the same row in the app again
@@ -396,6 +406,17 @@
     const cols = COLUMNS.map((col, c) => `<col min="${c + 1}" max="${c + 1}" width="${col.width}" customWidth="1"/>`).join('') +
       (withRef ? `<col min="${NC + 1}" max="${NC + 1}" width="18" hidden="1" customWidth="1"/>` : '');
     const qSheet = `'${sheetName.replace(/'/g, "''")}'`;
+    // Status column: one colour per value (conditional formatting) + a pick list in Excel
+    let statusRules = '';
+    if (lastRow >= FIRST) {
+      const range = `${colName(STATUS_COL)}${FIRST}:${colName(STATUS_COL)}${lastRow}`;
+      statusRules =
+        `<conditionalFormatting sqref="${range}">${STATUSES.map((st, i) =>
+          `<cfRule type="cellIs" dxfId="${i}" priority="${i + 1}" operator="equal"><formula>"${st.name}"</formula></cfRule>`).join('')}</conditionalFormatting>` +
+        `<dataValidations count="1"><dataValidation type="list" allowBlank="1" showErrorMessage="1" errorStyle="warning" ` +
+        `errorTitle="Status" error="Use New, In process, Done or Cancelled." sqref="${range}">` +
+        `<formula1>"${STATUSES.map((st) => st.name).join(',')}"</formula1></dataValidation></dataValidations>`;
+    }
 
     const sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
       '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
@@ -410,6 +431,7 @@
       `<sheetData>${sheetRows.join('')}</sheetData>` +
       `<autoFilter ref="A${HEAD}:${LAST}${Math.max(lastRow, HEAD)}"/>` +
       `<mergeCells count="2"><mergeCell ref="A1:${LAST}1"/><mergeCell ref="A2:${LAST}2"/></mergeCells>` +
+      statusRules +
       '<printOptions horizontalCentered="1"/>' +
       '<pageMargins left="0.3" right="0.3" top="0.4" bottom="0.5" header="0.2" footer="0.25"/>' +
       '<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/>' +
@@ -546,7 +568,7 @@
     return zip(files);
   }
 
-  const API = { zip, unzip, unzipAsync, crc32, jpegSize, colName, colIndex, buildPartsXlsx, COLUMNS, PHOTO_SLOTS };
+  const API = { zip, unzip, unzipAsync, crc32, jpegSize, colName, colIndex, buildPartsXlsx, COLUMNS, PHOTO_SLOTS, STATUSES };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   else root.ACPX = API;
 })(typeof self !== 'undefined' ? self : this);

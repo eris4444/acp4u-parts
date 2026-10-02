@@ -237,6 +237,13 @@ form#entryForm { padding: 16px 22px 22px; }
 .field input.plat-other { margin-top: 8px; max-width: 260px; }
 .ptag { display: inline-flex; align-items: center; gap: 5px; margin-top: 3px; border-radius: 999px; padding: 0 9px; font-size: 11.5px; font-weight: 700; line-height: 1.8; background: var(--c); color: var(--fg, #fff); }
 
+/* ---------- work status ---------- */
+.stsel { appearance: none; -webkit-appearance: none; border: 1.5px solid transparent; border-radius: 999px; padding: 4px 28px 4px 12px; font-weight: 700; font-size: 12.5px; color: var(--c); background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23475569' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center; cursor: pointer; outline: none; }
+.stsel:hover, .stsel:focus-visible { border-color: var(--c); }
+.sttag { display: inline-block; border-radius: 999px; padding: 0 10px; font-size: 12.5px; font-weight: 700; line-height: 1.8; color: var(--c); background: var(--bg); }
+.fsel { border: 1px solid var(--line); background: var(--navy-50); border-radius: 11px; padding: 7px 10px; font-size: 13px; font-weight: 600; color: var(--navy-700); outline: none; cursor: pointer; }
+.fsel:focus { border-color: var(--orange); }
+
 /* ---------- exports folder + file search ---------- */
 .banner.warn { background: var(--warn-bg); color: var(--warn); border: 1px solid #F8D9AE; }
 .banner.warn svg, .banner.info svg.fold { color: var(--orange-600); flex-shrink: 0; }
@@ -385,7 +392,7 @@ mark { background: #FFE08A; color: inherit; border-radius: 3px; padding: 0 1px; 
     <div class="stat"><div class="stat-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div><div><b id="stTotal">0</b><span>Total requests</span></div></div>
     <div class="stat"><div class="stat-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div><b id="stToday">0</b><span>Added today</span></div></div>
     <div class="stat"><div class="stat-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><b id="stPending">0</b><span>Not exported yet</span></div></div>
-    <div class="stat"><div class="stat-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></div><div><b id="stPhotos">0</b><span>Photos saved</span></div></div>
+    <div class="stat"><div class="stat-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div><div><b id="stWork">0</b><span>In process</span></div></div>
   </section>
 
   <section class="card" id="formCard">
@@ -420,6 +427,9 @@ mark { background: #FFE08A; color: inherit; border-radius: 3px; padding: 0 1px; 
           <small class="hint" id="vinHint"></small></label>
         <label class="field span2"><span>Required part <i>*</i></span>
           <textarea id="f-part" rows="2" maxlength="2000" placeholder="e.g. Right headlight — front brake pads — left side mirror with indicator"></textarea></label>
+        <div class="field wide"><span>Status <em>(change it any time — also from the list below)</em></span>
+          <div class="plats" id="sts" role="radiogroup" aria-label="Status"></div>
+          <input type="hidden" id="f-status"></div>
       </div>
 
       <div class="photos-head">
@@ -448,7 +458,10 @@ mark { background: #FFE08A; color: inherit; border-radius: 3px; padding: 0 1px; 
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="q" type="search" placeholder="Search ID, phone, car, VIN, part…">
       </div>
-      <div class="seg" id="status" title="Export status">
+      <select class="fsel" id="workFilter" title="Work status">
+        <option value="all">Any status</option><option>New</option><option>In process</option><option>Done</option><option>Cancelled</option>
+      </select>
+      <div class="seg" id="expSeg" title="Export status">
         <button type="button" data-s="all" class="on">All</button>
         <button type="button" data-s="new">Not exported</button>
         <button type="button" data-s="done">Exported</button>
@@ -468,7 +481,7 @@ mark { background: #FFE08A; color: inherit; border-radius: 3px; padding: 0 1px; 
     <div class="table-wrap">
       <table class="tbl" id="tbl">
         <thead><tr>
-          <th>No.</th><th>Customer ID</th><th>Phone</th><th>Country / City</th><th>Car</th><th>Year</th><th>VIN code</th><th>Required part</th><th class="ph">Photos</th><th>Added</th><th></th>
+          <th>No.</th><th>Customer ID</th><th>Phone</th><th>Country / City</th><th>Car</th><th>Year</th><th>VIN code</th><th>Required part</th><th>Status</th><th class="ph">Photos</th><th>Added</th><th></th>
         </tr></thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -556,9 +569,9 @@ mark { background: #FFE08A; color: inherit; border-radius: 3px; padding: 0 1px; 
 /* =================================================================== basics */
 const $ = (s, el = document) => el.querySelector(s);
 const SLOTS = 5;
-const FIELDS = ['customerId', 'platform', 'phone', 'location', 'brand', 'model', 'year', 'vin', 'part'];
+const FIELDS = ['customerId', 'platform', 'phone', 'location', 'brand', 'model', 'year', 'vin', 'part', 'status'];
 const REQUIRED = ['customerId', 'brand', 'model', 'year', 'part'];
-const LABELS = { customerId: 'Customer ID', platform: 'Platform', phone: 'Phone number', location: 'Country / City', brand: 'Car brand', model: 'Car model', year: 'Model year', vin: 'VIN code', part: 'Required part' };
+const LABELS = { customerId: 'Customer ID', platform: 'Platform', phone: 'Phone number', location: 'Country / City', brand: 'Car brand', model: 'Car model', year: 'Model year', vin: 'VIN code', part: 'Required part', status: 'Status' };
 const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 // SHA-256 of "acp4u|<username>|<password>" — the sign-in check never stores the password itself
 const AUTH_HASH = '7a8ccf07457917235af4316dd08f066ae4553b93a0f647f95bfe9530c38b5034';
@@ -590,9 +603,14 @@ const NORMALIZE = {
   year: (v) => enDigits(String(v).trim()).replace(/\s+/g, ''),
   vin: (v) => enDigits(String(v).trim()).toUpperCase().replace(/[\s-]/g, ''),
   part: (v) => String(v).trim(),
+  status: (v) => {
+    const t = String(v).trim().replace(/\s+/g, ' ');
+    const known = statusOf(t);
+    return known ? known.name : (STATUS_ALIAS[t.toLowerCase().replace(/[\s_-]+/g, '')] || t);
+  },
 };
 // Excel header text -> app field (headers written by xlsx.js)
-const LABEL_KEY = { 'customer id': 'customerId', platform: 'platform', phone: 'phone', 'country / city': 'location', 'car brand': 'brand', 'car model': 'model', year: 'year', 'vin code': 'vin', 'required part': 'part' };
+const LABEL_KEY = { 'customer id': 'customerId', platform: 'platform', phone: 'phone', 'country / city': 'location', 'car brand': 'brand', 'car model': 'model', year: 'year', 'vin code': 'vin', 'required part': 'part', status: 'status' };
 
 function sha256Hex(text) {
   const rotr = (v, n) => (v >>> n) | (v << (32 - n));
@@ -637,6 +655,17 @@ const ICON = {
   trash: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>',
   sheet: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="m8 12 5 6M13 12l-5 6"/></svg>',
 };
+
+// work status of a request — the colours match the Excel file
+const STATUSES = [
+  { name: 'New', c: '#1D4ED8', bg: '#DBEAFE' },
+  { name: 'In process', c: '#B45309', bg: '#FEF3C7' },
+  { name: 'Done', c: '#15803D', bg: '#DCFCE7' },
+  { name: 'Cancelled', c: '#4B5563', bg: '#E5E7EB' },
+];
+const STATUS_ALIAS = { inprocess: 'In process', inprogress: 'In process', processing: 'In process', canceled: 'Cancelled', finished: 'Done', complete: 'Done', completed: 'Done' };
+const statusOf = (v) => STATUSES.find((x) => x.name.toLowerCase() === String(v || '').trim().toLowerCase());
+const statusStyle = (v) => { const x = statusOf(v) || { c: '#334155', bg: '#E2E8F0' }; return `--c:${x.c};--bg:${x.bg}`; };
 
 // where the customer ID comes from; fg = text colour on the brand colour
 const PLATFORMS = [
@@ -961,7 +990,8 @@ const state = {
   filtered: [],
   q: '',
   period: 'all',
-  status: 'all',
+  exp: 'all',  // exported / not exported filter
+  work: 'all', // New / In process / Done / Cancelled filter
   shown: 60,
   editingId: null,
   photos: Array(SLOTS).fill(null), // {state:'new'|'keep'|'loading', url, own, full, xl, w, h}
@@ -973,6 +1003,7 @@ function fixRecord(r) {
   r.createdAt = Number(r.createdAt) || 0;
   r.updatedAt = Number(r.updatedAt) || r.createdAt;
   r.exportedAt = Number(r.exportedAt) || null;
+  r.status = NORMALIZE.status(r.status) || 'New'; // rows saved before statuses existed
   const ph = Array.isArray(r.photos) ? r.photos : [];
   r.photos = Array.from({ length: SLOTS }, (_, i) => ph[i] || null);
   return r;
@@ -1037,6 +1068,11 @@ function renderPlatforms() {
   if (other) oi.value = v;
   field('customerId').placeholder = known ? known.id : '@username';
 }
+function renderStatusChips() {
+  const v = field('status').value;
+  $('#sts').innerHTML = STATUSES.map((x) =>
+    `<button type="button" class="plat${x.name === v ? ' on' : ''}" role="radio" aria-checked="${x.name === v}" data-st="${esc(x.name)}" style="--c:${x.c}"><i></i>${esc(x.name)}</button>`).join('');
+}
 function setPlatform(v, remember) {
   field('platform').value = v;
   if (remember) { try { localStorage.setItem(PLATFORM_KEY, v); } catch (_) { /* optional */ } }
@@ -1052,6 +1088,8 @@ function resetForm() {
   delete $('#platOther').dataset.open;
   $('#platOther').value = '';
   setPlatform(lastPlatform());
+  field('status').value = 'New';
+  renderStatusChips();
   state.editingId = null;
   state.dirty = false;
   clearTimeout(draftTimer);
@@ -1073,14 +1111,16 @@ function saveDraft() {
   if (state.editingId || !store.db) return;
   const fields = Object.fromEntries(FIELDS.map((k) => [k, field(k).value]));
   const photos = state.photos.map((p) => (p && p.state === 'new' ? { full: p.full, xl: p.xl, w: p.w, h: p.h } : null));
-  const empty = !FIELDS.some((k) => k !== 'platform' && fields[k].trim()) && !photos.some(Boolean);
+  const empty = !FIELDS.some((k) => k !== 'platform' && k !== 'status' && fields[k].trim()) && !photos.some(Boolean);
   (empty ? store.delMeta('draft') : store.setMeta('draft', { fields, photos, at: Date.now() })).catch(() => {});
 }
 async function restoreDraft() {
   const d = await store.getMeta('draft').catch(() => null);
   if (!d || !d.fields) return;
   FIELDS.forEach((k) => { field(k).value = d.fields[k] || ''; });
+  if (!field('status').value) field('status').value = 'New';
   renderPlatforms();
+  renderStatusChips();
   state.photos = Array.from({ length: SLOTS }, (_, i) => {
     const p = d.photos && d.photos[i];
     return p && p.full ? { state: 'new', full: p.full, xl: p.xl || p.full, w: p.w, h: p.h, url: URL.createObjectURL(p.xl || p.full), own: true } : null;
@@ -1213,6 +1253,7 @@ async function startEdit(id) {
   state.editingId = id;
   FIELDS.forEach((k) => { field(k).value = r[k] || ''; });
   renderPlatforms();
+  renderStatusChips();
   state.photos = r.photos.map((p, i) => (p ? { state: 'keep', w: p.w, h: p.h, ...store.slotUrl(r, i) } : null));
   renderSlots();
   updateVinHint();
@@ -1235,6 +1276,10 @@ async function onSubmit(e) {
     return { state: 'new', full: p.full, xl: p.xl, w: p.w, h: p.h };
   });
   const wasEdit = !!state.editingId;
+  if (!d.status) d.status = 'New';
+  const before = wasEdit ? state.records.find((r) => r.id === state.editingId) : null;
+  const statusChanged = !!before && before.status !== d.status;
+  if (statusChanged) await folder.ensure();
   $('#btnSave').disabled = true;
   try {
     const rec = await store.save({ id: state.editingId || undefined, ...d, photos });
@@ -1243,6 +1288,7 @@ async function onSubmit(e) {
     await reload();
     const n = state.rowNo.get(rec.id);
     toast(wasEdit ? `Row ${n} updated.` : `Row ${n} saved ✓`, 'ok');
+    if (statusChanged) syncStatusToFiles(rec.id, d.status).then((res) => { if (res.updated || res.failed) toast(statusMessage(n, d.status, res), res.failed ? 'warn' : 'ok', 5000); });
     flashRow(rec.id);
     field('customerId').focus();
   } catch (err) {
@@ -1258,7 +1304,8 @@ function applyFilter() {
   const sod = startOfToday();
   const from = state.period === 'today' ? sod : state.period === '7' ? sod - 6 * 864e5 : state.period === '30' ? sod - 29 * 864e5 : 0;
   state.filtered = state.records.filter((r) => r.createdAt >= from &&
-    (state.status === 'all' || (state.status === 'new' ? !r.exportedAt : !!r.exportedAt)) &&
+    (state.exp === 'all' || (state.exp === 'new' ? !r.exportedAt : !!r.exportedAt)) &&
+    (state.work === 'all' || r.status === state.work) &&
     (!q || norm(FIELDS.map((k) => r[k]).join(' ')).includes(q)));
 }
 
@@ -1280,6 +1327,7 @@ function rowHtml(r) {
     <td data-l="Year">${esc(r.year)}</td>
     <td data-l="VIN code" class="mono">${r.vin ? esc(r.vin) : dash}</td>
     <td data-l="Required part" class="part"><bdi>${esc(r.part).replace(/\n/g, '<br>')}</bdi></td>
+    <td data-l="Status"><select class="stsel" data-status="${r.id}" style="${statusStyle(r.status)}" aria-label="Status of row ${state.rowNo.get(r.id)}">${STATUSES.map((x) => `<option${x.name === r.status ? ' selected' : ''}>${x.name}</option>`).join('')}${statusOf(r.status) ? '' : `<option selected>${esc(r.status)}</option>`}</select></td>
     <td data-l="Photos"><div class="thumbs">${thumbs || dash}</div></td>
     <td data-l="Added" class="date"><div>${fmtDate.format(d)} <span class="muted">${fmtTime.format(d)}</span><br>${chip}</div></td>
     <td class="acts"><button type="button" class="ib" data-edit="${r.id}" title="Edit">${ICON.edit}</button><button type="button" class="ib danger" data-del="${r.id}" title="Delete">${ICON.trash}</button></td>
@@ -1308,7 +1356,7 @@ function renderStats() {
   $('#stTotal').textContent = state.records.length;
   $('#stToday').textContent = state.records.filter((r) => r.createdAt >= sod).length;
   $('#stPending').textContent = state.records.filter((r) => !r.exportedAt).length;
-  $('#stPhotos').textContent = state.records.reduce((a, r) => a + r.photos.filter(Boolean).length, 0);
+  $('#stWork').textContent = state.records.filter((r) => r.status === 'In process').length;
 }
 
 function flashRow(id) {
@@ -1317,6 +1365,57 @@ function flashRow(id) {
   tr.classList.remove('flash');
   void tr.offsetWidth;
   tr.classList.add('flash');
+}
+
+function statusMessage(n, status, res) {
+  let msg = `Row ${n} is now “${status}”`;
+  if (res.updated) msg += ` — also changed in ${plural(res.updated, 'Excel file')}`;
+  if (res.failed) msg += ` — ${plural(res.failed, 'Excel file')} could not be changed (open in Excel?)`;
+  return `${msg}.`;
+}
+
+/** Status changes are written into every exported Excel file that holds the row (found by its hidden Ref). */
+async function syncStatusToFiles(id, status) {
+  const out = { updated: 0, failed: 0 };
+  if (!folder.ok) return out;
+  try { await refreshIndex(); } catch (_) { return out; }
+  for (const f of [...fileIndex.values()]) {
+    const edits = [];
+    f.sheets.forEach((sh) => {
+      if (sh.refCol == null || sh.statusCol == null) return; // files exported before the Status column
+      sh.rows.forEach((row) => {
+        if (row.cells[sh.refCol] === id && (row.cells[sh.statusCol] || '') !== status) edits.push({ sh, r: row.r, col: sh.statusCol, val: status });
+      });
+    });
+    if (!edits.length) continue;
+    try { await patchFile(f, edits); out.updated++; } catch (_) { out.failed++; }
+  }
+  if (out.updated) await refreshIndex();
+  return out;
+}
+
+async function updateStatus(id, status) {
+  const rec = state.records.find((r) => r.id === id);
+  if (!rec || rec.status === status) return;
+  await folder.ensure(); // still inside the click, so the browser may ask for the folder again
+  try {
+    // only the status changes: the row keeps its "exported" mark because the Excel files are updated too
+    await store.save({
+      id: rec.id, createdAt: rec.createdAt, exportedAt: rec.exportedAt,
+      ...Object.fromEntries(FIELDS.map((k) => [k, rec[k]])), status,
+      photos: rec.photos.map((p) => (p ? { state: 'keep' } : null)),
+    });
+  } catch (err) {
+    toast(err.message || 'Saving failed.', 'error', 5000);
+    await reload();
+    return;
+  }
+  if (state.editingId === id) { field('status').value = status; renderStatusChips(); }
+  await reload();
+  const res = await syncStatusToFiles(id, status);
+  let msg = statusMessage(state.rowNo.get(id), status, res);
+  if (rec.exportedAt && !folder.ok) msg += ' Connect the exports folder to change it in the Excel files too.';
+  toast(msg, res.failed ? 'warn' : 'ok', 5000);
 }
 
 async function deleteRec(id) {
@@ -1379,7 +1478,8 @@ function lbStep(d) {
 /* =================================================================== excel / backup */
 function filterLabel() {
   const parts = [];
-  if (state.status !== 'all') parts.push(state.status === 'new' ? 'not exported before' : 'exported before');
+  if (state.work !== 'all') parts.push(`status ${state.work}`);
+  if (state.exp !== 'all') parts.push(state.exp === 'new' ? 'not exported before' : 'exported before');
   if (state.period !== 'all') parts.push({ today: 'added today', 7: 'last 7 days', 30: 'last 30 days' }[state.period]);
   if (state.q.trim()) parts.push(`search “${state.q.trim()}”`);
   return parts.length ? `   |   Filter: ${parts.join(', ')}` : '';
@@ -1780,9 +1880,11 @@ async function readWorkbook(bytes) {
     const skip = new Set();
     const photoCols = new Set();
     let refCol = null;
+    let statusCol = null;
     Object.keys(header).forEach((c) => {
       const l = String(header[c]).trim().toLowerCase();
       if (l === 'ref') { refCol = +c; skip.add(+c); }
+      else if (l === 'status') statusCol = +c;
       else if (/^(no\.?|#)$/.test(l)) skip.add(+c);
       else if (/^photo\s*\d+$/.test(l)) photoCols.add(+c);
     });
@@ -1803,7 +1905,7 @@ async function readWorkbook(bytes) {
       }
       Object.values(images).forEach((list) => list.sort((x, y) => x.col - y.col));
     }
-    sheets.push({ name: s.getAttribute('name') || 'Sheet', path: rel.target, headerRow, header, skip, photoCols, refCol, images, rows: rows.filter((row) => row.r > headerRow) });
+    sheets.push({ name: s.getAttribute('name') || 'Sheet', path: rel.target, headerRow, header, skip, photoCols, refCol, statusCol, images, rows: rows.filter((row) => row.r > headerRow) });
   }
   return { sheets };
 }
@@ -1946,7 +2048,8 @@ function resultHtml(res, tokens) {
   const noCol = Object.keys(sh.header).find((c) => /^(no\.?|#)$/i.test(String(sh.header[c]).trim()));
   const no = noCol != null ? row.cells[noCol] : '';
   const fields = editableCols(sh, row).filter((c) => row.cells[c]).map((c) =>
-    `<div class="sp-f${fieldKey(sh, c) === 'part' ? ' part' : ''}"><span>${esc(cellLabel(sh, c))}</span><div>${hl(row.cells[c], tokens)}</div></div>`).join('');
+    `<div class="sp-f${fieldKey(sh, c) === 'part' ? ' part' : ''}"><span>${esc(cellLabel(sh, c))}</span><div>${fieldKey(sh, c) === 'status'
+      ? `<span class="sttag" style="${statusStyle(row.cells[c])}">${hl(row.cells[c], tokens)}</span>` : hl(row.cells[c], tokens)}</div></div>`).join('');
   const thumbs = (sh.images[row.r] || []).map((im, k) =>
     `<button type="button" class="th" data-sp-photo="${k}" title="Photo ${k + 1}"><img alt="" data-media="${esc(im.media)}"></button>`).join('');
   return `<div class="sp-row" data-key="${esc(res.key)}">
@@ -2018,6 +2121,10 @@ function startFileEdit(key) {
       const v = res.row.cells[c] || '';
       const k = fieldKey(res.sh, c);
       const long = k === 'part' || v.length > 60 || v.includes('\n');
+      if (k === 'status') {
+        return `<label class="field"><span>${esc(cellLabel(res.sh, c))}</span><select data-col="${c}" class="fsel">${STATUSES.map((x) =>
+          `<option${x.name === NORMALIZE.status(v) ? ' selected' : ''}>${x.name}</option>`).join('')}${v && !statusOf(NORMALIZE.status(v)) ? `<option selected>${esc(v)}</option>` : ''}${v ? '' : '<option value="" selected>—</option>'}</select></label>`;
+      }
       return `<label class="field${long ? ' wide' : ''}"><span>${esc(cellLabel(res.sh, c))}</span>${long
         ? `<textarea data-col="${c}" rows="2">${esc(v)}</textarea>`
         : `<input data-col="${c}" value="${esc(v)}"${k === 'vin' ? ' class="mono"' : ''}>`}</label>`;
@@ -2026,6 +2133,23 @@ function startFileEdit(key) {
     <p class="sp-note">${linked ? 'This row came from the app — its row in the app is updated too.' : 'Only the Excel file is changed.'} If the file is open in Excel, close it before saving.</p>`;
   const first = el.querySelector('[data-col]');
   if (first) first.focus();
+}
+
+/** Writes [{sh, r, col, val}] into an Excel file in the folder, keeping everything else byte-for-byte. */
+async function patchFile(f, edits) {
+  const file = await folder.readFile(f);
+  if (file.lastModified !== f.lastModified || file.size !== f.size) throw new ChangedError();
+  const entries = await ACPX.unzipAsync(file.bytes);
+  const dec = new TextDecoder();
+  const enc = new TextEncoder();
+  const bySheet = new Map();
+  edits.forEach((e) => { if (!bySheet.has(e.sh.path)) bySheet.set(e.sh.path, []); bySheet.get(e.sh.path).push(e); });
+  bySheet.forEach((list, path) => {
+    let xml = dec.decode(entries[path]);
+    list.forEach((e) => { xml = setCellText(xml, ACPX.colName(e.col), e.r, e.val); });
+    entries[path] = enc.encode(xml);
+  });
+  await folder.writeFile(f, new Blob(ACPX.zip(Object.keys(entries).map((name) => ({ name, data: entries[name] }))), { type: XLSX_MIME }));
 }
 
 async function saveFileEdit(key) {
@@ -2044,13 +2168,7 @@ async function saveFileEdit(key) {
   if (!Object.keys(changed).length) { runSearch(); toast('Nothing was changed.'); return; }
   busy.show('Saving the Excel file…');
   try {
-    const file = await folder.readFile(f);
-    if (file.lastModified !== f.lastModified || file.size !== f.size) throw new ChangedError();
-    const entries = await ACPX.unzipAsync(file.bytes);
-    let xml = new TextDecoder().decode(entries[sh.path]);
-    Object.entries(changed).forEach(([col, v]) => { xml = setCellText(xml, ACPX.colName(+col), row.r, v); });
-    entries[sh.path] = new TextEncoder().encode(xml);
-    await folder.writeFile(f, new Blob(ACPX.zip(Object.keys(entries).map((name) => ({ name, data: entries[name] }))), { type: XLSX_MIME }));
+    await patchFile(f, Object.entries(changed).map(([col, v]) => ({ sh, r: row.r, col: +col, val: v })));
   } catch (err) {
     busy.hide();
     if (err instanceof ChangedError) {
@@ -2242,9 +2360,11 @@ function wire() {
     state.q = field('customerId').value.trim().replace(/^@+/, '');
     $('#q').value = state.q;
     state.period = 'all';
-    state.status = 'all';
+    state.exp = 'all';
+    state.work = 'all';
+    $('#workFilter').value = 'all';
     document.querySelectorAll('#period button').forEach((b) => b.classList.toggle('on', b.dataset.p === 'all'));
-    document.querySelectorAll('#status button').forEach((b) => b.classList.toggle('on', b.dataset.s === 'all'));
+    document.querySelectorAll('#expSeg button').forEach((b) => b.classList.toggle('on', b.dataset.s === 'all'));
     state.shown = 60;
     renderList();
     $('#listCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2263,6 +2383,14 @@ function wire() {
       oi.hidden = false;
       oi.focus();
     }
+    if (state.editingId) state.dirty = true;
+    scheduleDraft();
+  });
+  $('#sts').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-st]');
+    if (!b) return;
+    field('status').value = b.dataset.st;
+    renderStatusChips();
     if (state.editingId) state.dirty = true;
     scheduleDraft();
   });
@@ -2329,15 +2457,20 @@ function wire() {
     document.querySelectorAll('#period button').forEach((x) => x.classList.toggle('on', x === b));
     renderList();
   });
-  $('#status').addEventListener('click', (e) => {
+  $('#expSeg').addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (!b) return;
-    state.status = b.dataset.s;
+    state.exp = b.dataset.s;
     state.shown = 60;
-    document.querySelectorAll('#status button').forEach((x) => x.classList.toggle('on', x === b));
+    document.querySelectorAll('#expSeg button').forEach((x) => x.classList.toggle('on', x === b));
     renderList();
   });
   $('#btnMore').addEventListener('click', () => { state.shown += 60; renderList(); });
+  $('#workFilter').addEventListener('change', (e) => { state.work = e.target.value; state.shown = 60; renderList(); });
+  $('#tbody').addEventListener('change', (e) => {
+    const sel = e.target.closest('select[data-status]');
+    if (sel) updateStatus(sel.dataset.status, sel.value);
+  });
   $('#tbody').addEventListener('click', (e) => {
     const v = e.target.closest('[data-view]');
     if (v) { openLightbox(v.dataset.view, +v.dataset.i); return; }
@@ -2417,6 +2550,8 @@ async function boot() {
   wire();
   renderSlots();
   setPlatform(lastPlatform());
+  field('status').value = 'New';
+  renderStatusChips();
   updateFormMode();
   if (typeof ACPX === 'undefined') { fatal('xlsx.js was not found — keep index.html and xlsx.js together in the same folder.'); return; }
   diskInfo = await detectDisk();

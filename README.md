@@ -2,7 +2,7 @@
 
 Log customer car-parts requests one by one — customer ID and the platform it came from
 (Instagram, TikTok, Facebook, WhatsApp…), phone, country / city, car brand, model, year,
-VIN, the part needed and up to 5 photos — then export them to a styled Excel file with the
+VIN, the part needed, a status (New / In process / Done / Cancelled) and up to 5 photos — then export them to a styled Excel file with the
 photos placed inside the cells. Every Excel file the app writes can be searched and edited
 from the app.
 
@@ -22,12 +22,21 @@ No `curl`? Use `wget -qO- https://raw.githubusercontent.com/eris4444/acp4u-parts
 
 Then open **ACP4U Parts** from the applications menu or the desktop icon, or run `acp4u-parts`.
 
+**Update an existing install** (rows, photos and Excel files are kept):
+
+```bash
+acp4u-parts --update
+```
+
+If the `acp4u-parts` command is not found, run the install command above again — it updates in place.
+
 | Command | What it does |
 | --- | --- |
 | `acp4u-parts` | open the app |
 | `acp4u-parts --status` | where the data is and whether the service runs |
 | `acp4u-parts --stop` | stop the background service |
 | `acp4u-parts --update` | install the latest version (data is kept) |
+| `acp4u-parts --version` | show the installed version |
 | `acp4u-parts --uninstall` | remove the program (data is kept) |
 
 ## Where the data lives (Linux)
@@ -53,6 +62,9 @@ exports go to `Exports\`, backups to `Backups\`. With Python installed you can i
 
 - Sign-in screen, English interface, works offline
 - Save rows today, continue tomorrow, export when ready — each row shows whether it was exported
+- Status per request — New, In process, Done, Cancelled — set in the form or changed right in the
+  list; the change is also written into every exported Excel file that holds the row. In Excel the
+  Status cells are coloured and offer the same four values in a drop-down
 - Unfinished entries are kept as a draft if the window is closed
 - Photos: click, drag & drop or paste (Ctrl+V); stored in full size, shown in a viewer
 - Excel: centred cells, navy/orange design, frozen header, filters, photos inside the cells,
@@ -74,5 +86,6 @@ curl -fsSL https://raw.githubusercontent.com/eris4444/acp4u-parts/main/install.s
 بعد از نصب، برنامه **ACP4U Parts** در منوی برنامه‌ها و روی دسکتاپ هست؛ یا در ترمینال بنویسید `acp4u-parts`.
 
 - همه اطلاعات در پوشه `~/ACP4U-Parts` ذخیره می‌شود: اکسل‌ها در `Exports`، پشتیبان‌ها در `Backups`.
-- به‌روزرسانی: `acp4u-parts --update` — حذف برنامه (اطلاعات می‌ماند): `acp4u-parts --uninstall`
+- به‌روزرسانی (اطلاعات می‌ماند): `acp4u-parts --update` — حذف برنامه (اطلاعات می‌ماند): `acp4u-parts --uninstall`
+- وضعیت هر درخواست (New / In process / Done / Cancelled) در فرم یا مستقیم در لیست قابل تغییر است و در فایل‌های اکسل هم عوض می‌شود.
 - اگر Chrome یا Chromium یا Brave نصب باشد، برنامه در پنجره جداگانه مثل یک برنامه معمولی باز می‌شود.

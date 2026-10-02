@@ -32,7 +32,7 @@ from datetime import date
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = '1.1.0'
+VERSION = '1.2.0'
 REPO = 'eris4444/acp4u-parts'
 APP_DIR = Path(__file__).resolve().parent
 HOME = Path(os.environ.get('ACP4U_HOME') or (Path.home() / 'ACP4U-Parts')).expanduser()
@@ -58,7 +58,7 @@ MAX_JSON = 200 * 1024 * 1024  # one saved row with five photos is a few MB
 MAX_FILE = 2 * 1024 * 1024 * 1024
 SLOTS = 5
 FIELDS = {'customerId': 120, 'platform': 40, 'phone': 40, 'location': 80, 'brand': 80,
-          'model': 80, 'year': 20, 'vin': 40, 'part': 2000}
+          'model': 80, 'year': 20, 'vin': 40, 'part': 2000, 'status': 30}
 REQUIRED = ('customerId', 'brand', 'model', 'year', 'part')
 STATIC = {'/': 'index.html', '/index.html': 'index.html', '/xlsx.js': 'xlsx.js', '/icon.svg': 'icon.svg'}
 TYPES = {'.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml'}
